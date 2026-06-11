@@ -648,7 +648,12 @@ const App: React.FC<AppProps> = ({ user }) => {
              </button>
              <span className="text-[11px] font-mono font-bold tracking-[0.2em] text-white uppercase select-none">IDEATION ENGINE</span>
           </div>
-          <div className="hidden md:flex items-center gap-3 ml-auto">
+          <div className="flex md:hidden items-center ml-auto mr-2">
+             <button onClick={() => setShowGuidedTour(true)} className="flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-mono border border-thinklab-border rounded bg-thinklab-surface hover:bg-thinklab-border transition-all text-thinklab-text">
+                GUÍA
+             </button>
+          </div>
+          <div className="hidden md:flex items-center gap-3 md:ml-auto">
             {/* Trial counter pill */}
             <div className="flex items-center gap-1.5 px-3 py-1 bg-thinklab-surface border border-thinklab-border rounded-full">
               <div className={`w-1.5 h-1.5 rounded-full ${sessionCount >= MAX_SESSIONS ? 'bg-red-400' : sessionCount >= MAX_SESSIONS - 2 ? 'bg-amber-400' : 'bg-thinklab-cyan shadow-[0_0_8px_#00d4ff]'}`}></div>
