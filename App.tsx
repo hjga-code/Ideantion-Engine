@@ -223,7 +223,7 @@ const App: React.FC<AppProps> = ({ user }) => {
 
   // Check if guided tour was completed previously
   useEffect(() => {
-    const completed = localStorage.getItem('thinklab_guided_tour_completed');
+    const completed = localStorage.getItem('thinklab_guided_tour_completed_v2');
     if (!completed) {
       setShowGuidedTour(true);
     }

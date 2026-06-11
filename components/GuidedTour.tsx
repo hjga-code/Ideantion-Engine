@@ -16,9 +16,9 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({ onClose }) => {
 
   const steps: Step[] = [
     {
-      title: "Bienvenido a Ideation Engine",
-      subtitle: "Tu motor de ideación y refinamiento multi-workflow de alto rendimiento",
-      description: "Esta plataforma está diseñada para ayudarte a transformar notas de voz caóticas, transcripciones, ideas sueltas o imágenes en documentos profesionales estructurados, bases de datos o código al instante utilizando modelos de IA de última generación.",
+      title: "Welcome to Ideation Engine",
+      subtitle: "Your high-performance multi-workflow AI companion",
+      description: "This platform is designed to help you transform chaotic voice notes, raw drafts, or reference images into structured professional documents, valid data schemas (JSON), or spreadsheets (CSV) instantly using state-of-the-art AI models.",
       icon: (
         <div className="relative flex items-center justify-center w-28 h-28 rounded-full bg-blue-500/10 border border-blue-500/30 shadow-[0_0_30px_rgba(59,130,246,0.2)] animate-pulse-slow">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-14 h-14 text-blue-400">
@@ -28,9 +28,9 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({ onClose }) => {
       )
     },
     {
-      title: "Workflows Especializados",
-      subtitle: "8 Módulos diseñados para automatizar tus tareas recurrentes",
-      description: "En la parte inferior de la pantalla encontrarás 8 módulos (Generación de Contenido, Calendario Inteligente, SEO, Estructuración de Voz, Refinamiento de Texto, Motores de Tablas, Meta-Prompts e Ideación). Cada uno adapta la lógica y prompts de la IA para darte respuestas óptimas.",
+      title: "Specialized Workflows",
+      subtitle: "8 modules designed to automate your recurring tasks",
+      description: "At the bottom of the screen, you will find 8 modules (Content Generation, Smart Calendar, SEO, Voice to Structure, Pro Refinement, Table Engine, Universal Prompting, and Brainstorming). Each workflow adapts the AI logic and prompts to deliver optimal results.",
       icon: (
         <div className="relative grid grid-cols-3 gap-2 p-3 w-28 h-28 rounded-2xl bg-violet-500/10 border border-violet-500/30 shadow-[0_0_30px_rgba(139,92,246,0.2)]">
           <div className="rounded bg-violet-500/20 border border-violet-500/30"></div>
@@ -46,11 +46,11 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({ onClose }) => {
       )
     },
     {
-      title: "Panel de Configuración de Entrada",
-      subtitle: "Define idioma, presets de workflows y formatos de salida",
-      description: "Haz clic en el botón 'INPUT PANEL' (en la parte inferior) para desplegar el gestor de configuración. Aquí puedes configurar la clave API, seleccionar el modelo, definir el idioma de salida, cambiar los presets del workflow o elegir el formato del documento final (Markdown, JSON o CSV).",
+      title: "Input Control Panel",
+      subtitle: "Define output language, presets, and output formats",
+      description: "Click the 'INPUT PANEL' tab at the bottom to expand settings. Here you can configure API keys, select models, choose output languages, change presets, or select your final document format (Markdown, structured JSON, or CSV).",
       icon: (
-        <div className="relative flex items-center justify-center w-28 h-28 rounded-full bg-amber-500/10 border border-amber-500/30 shadow-[0_0_30px_rgba(245,158,11M,0.2)]">
+        <div className="relative flex items-center justify-center w-28 h-28 rounded-full bg-amber-500/10 border border-amber-500/30 shadow-[0_0_30px_rgba(245,158,11,0.2)]">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-14 h-14 text-amber-400">
             <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
           </svg>
@@ -58,9 +58,9 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({ onClose }) => {
       )
     },
     {
-      title: "Audio e Imágenes Incorporados",
-      subtitle: "Captura ideas con tu voz o adjunta referencias visuales",
-      description: "Pega o sube imágenes directamente para que la IA las tome como contexto visual. Además, con nuestro soporte de Audio Inteligente, puedes pulsar el icono del micrófono para grabar notas de voz desordenadas de hasta 10 minutos que se procesarán al instante.",
+      title: "Integrated Audio & Images",
+      subtitle: "Capture ideas on the go with your voice or visual references",
+      description: "Drag, paste, or upload images directly to serve as visual context. In addition, with our Smart Audio support, you can click the microphone icon to record chaotic voice notes up to 10 minutes long, which will be processed instantly.",
       icon: (
         <div className="relative flex items-center justify-center w-28 h-28 rounded-full bg-emerald-500/10 border border-emerald-500/30 shadow-[0_0_30px_rgba(16,185,129,0.2)]">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-14 h-14 text-emerald-400">
@@ -75,9 +75,9 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({ onClose }) => {
       )
     },
     {
-      title: "El Widget Flotante (PiP)",
-      subtitle: "Trabaja de forma ultra productiva en segundo plano",
-      description: "Haz clic en el botón 'WIDGET' del encabezado para abrir una versión compacta y minimalista. Si tu navegador lo admite, puedes activar el modo Picture-in-Picture (PiP) para tener una ventana flotante siempre visible mientras dictas tus notas y las copias automáticamente al portapapeles sin salir de otras aplicaciones.",
+      title: "Floating Widget (PiP)",
+      subtitle: "Work ultra-productively in the background",
+      description: "Click the 'WIDGET' button in the header to open a compact, minimalist view. If your browser supports it, you can activate Picture-in-Picture (PiP) mode to keep a floating window always visible, letting you dictate notes and copy results to the clipboard while working in other apps.",
       icon: (
         <div className="relative flex items-center justify-center w-28 h-28 rounded-full bg-cyan-500/10 border border-cyan-500/30 shadow-[0_0_30px_rgba(6,182,212,0.2)]">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-14 h-14 text-cyan-400">
@@ -106,7 +106,7 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({ onClose }) => {
   };
 
   const handleComplete = () => {
-    localStorage.setItem('thinklab_guided_tour_completed', 'true');
+    localStorage.setItem('thinklab_guided_tour_completed_v2', 'true');
     onClose();
   };
 
@@ -126,7 +126,7 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({ onClose }) => {
           onClick={handleComplete} 
           className="absolute top-4 right-4 text-xs font-mono text-gray-500 hover:text-white transition-colors"
         >
-          Saltar Guía ✕
+          Skip Tour ✕
         </button>
 
         {/* Dynamic Step Icon */}
@@ -175,14 +175,14 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({ onClose }) => {
                   : 'border-white/10 text-gray-400 hover:text-white hover:bg-white/5'
               }`}
             >
-              ← Anterior
+              ← Back
             </button>
 
             <button
               onClick={handleNext}
               className="px-6 py-2.5 rounded-lg text-xs font-mono font-bold bg-blue-600 hover:bg-blue-500 text-white transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)]"
             >
-              {currentStep === steps.length - 1 ? '¡Comenzar!' : 'Siguiente →'}
+              {currentStep === steps.length - 1 ? 'Get Started!' : 'Next →'}
             </button>
           </div>
         </div>
