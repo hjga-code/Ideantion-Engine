@@ -1,0 +1,7 @@
+{
+  "name": "ThinkLab Ideation Engine",
+  "description": "A high-fidelity tool for Creative Directors to capture and process ideas via multimodal AI.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
