@@ -203,7 +203,10 @@ const App: React.FC<AppProps> = ({ user }) => {
   const [skillNotification, setSkillNotification] = useState<{module: ModuleType, details: string} | null>(null);
 
   const [activeModule, setActiveModule] = useState<ModuleType>(ModuleType.IDEATION);
-  const [showGuidedTour, setShowGuidedTour] = useState(false);
+  // Initialize directly from localStorage — avoids async useEffect race condition on auth redirect
+  const [showGuidedTour, setShowGuidedTour] = useState<boolean>(
+    () => !localStorage.getItem('thinklab_guided_tour_completed_v2')
+  );
   
   const [input, setInput] = useState<UserInput>({
     text: '',
@@ -220,14 +223,6 @@ const App: React.FC<AppProps> = ({ user }) => {
   });
 
   // --- EFFECTS ---
-
-  // Check if guided tour was completed previously
-  useEffect(() => {
-    const completed = localStorage.getItem('thinklab_guided_tour_completed_v2');
-    if (!completed) {
-      setShowGuidedTour(true);
-    }
-  }, []);
 
   // Load sessions from Supabase on mount
   const refreshSessions = useCallback(async () => {

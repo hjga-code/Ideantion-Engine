@@ -18,12 +18,29 @@ export default defineConfig(({ mode }) => {
       port: 3000,
       strictPort: true,
     },
+    // FIX: process.env must be defined as an object containing specific keys.
+    // Defining 'process.env': {} LAST was overriding the specific keys above it.
     define: {
-      'process.env.API_KEY': JSON.stringify(env.API_KEY),
-      'process.env.OPENROUTER_API_KEY': JSON.stringify(env.OPENROUTER_API_KEY),
-      // Polyfill process.env to empty object to prevent crashes in libs accessing it directly,
-      // while allowing specific keys above to take precedence.
-      'process.env': {}
+      'process.env': {
+        API_KEY: env.API_KEY || '',
+        OPENROUTER_API_KEY: env.OPENROUTER_API_KEY || '',
+      }
+    },
+    build: {
+      // Vercel-compatible chunking — suppress chunk size warning
+      chunkSizeWarningLimit: 1000,
+      rollupOptions: {
+        output: {
+          manualChunks: (id: string) => {
+            if (id.includes('node_modules/react') || id.includes('node_modules/react-dom')) {
+              return 'vendor-react';
+            }
+            if (id.includes('node_modules/@supabase')) {
+              return 'vendor-supabase';
+            }
+          }
+        }
+      }
     }
   };
 });
