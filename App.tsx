@@ -14,7 +14,6 @@ import { getSessions, upsertSession, deleteSession, getUserSettings, saveUserSet
 import { Session, ChatMessage, ModuleType, ProcessingState, UserInput, AudioState, PresetType, TargetLanguage, OutputFormat, AIProvider } from './types';
 import { MODULE_ICONS, MODULE_DESCRIPTIONS, PRESETS, LANGUAGES, FORMATS, GEMINI_MODELS, OPENROUTER_MODELS, MODULE_SPECIFIC_CONFIG } from './constants';
 import { ThinkLabLogo } from './components/ThinkLabLogo';
-import { GuidedTour } from './components/GuidedTour';
 
 
 // --- ROBUST CLIPBOARD UTILITY ---
@@ -203,10 +202,6 @@ const App: React.FC<AppProps> = ({ user }) => {
   const [skillNotification, setSkillNotification] = useState<{module: ModuleType, details: string} | null>(null);
 
   const [activeModule, setActiveModule] = useState<ModuleType>(ModuleType.IDEATION);
-  // Initialize directly from localStorage — avoids async useEffect race condition on auth redirect
-  const [showGuidedTour, setShowGuidedTour] = useState<boolean>(
-    () => !localStorage.getItem('thinklab_guided_tour_completed_v2')
-  );
   
   const [input, setInput] = useState<UserInput>({
     text: '',
@@ -643,11 +638,6 @@ const App: React.FC<AppProps> = ({ user }) => {
              </button>
              <span className="text-[11px] font-mono font-bold tracking-[0.2em] text-white uppercase select-none">IDEATION ENGINE</span>
           </div>
-          <div className="flex md:hidden items-center ml-auto mr-2">
-             <button onClick={() => setShowGuidedTour(true)} className="flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-mono border border-thinklab-border rounded bg-thinklab-surface hover:bg-thinklab-border transition-all text-thinklab-text">
-                GUÍA
-             </button>
-          </div>
           <div className="hidden md:flex items-center gap-3 md:ml-auto">
             {/* Trial counter pill */}
             <div className="flex items-center gap-1.5 px-3 py-1 bg-thinklab-surface border border-thinklab-border rounded-full">
@@ -656,9 +646,6 @@ const App: React.FC<AppProps> = ({ user }) => {
             </div>
             <button onClick={() => setIsWidgetMode(true)} className="flex items-center gap-2 px-3 py-1.5 text-xs font-mono border border-thinklab-border rounded hover:bg-thinklab-surface transition-all text-thinklab-text">
                WIDGET
-            </button>
-            <button onClick={() => setShowGuidedTour(true)} className="flex items-center gap-2 px-3 py-1.5 text-xs font-mono border border-thinklab-border rounded hover:bg-thinklab-surface transition-all text-thinklab-text">
-               GUÍA
             </button>
             {/* User avatar + logout */}
             <div className="flex items-center gap-2">
@@ -1147,7 +1134,6 @@ const App: React.FC<AppProps> = ({ user }) => {
         </div>
 
       </main>
-      {showGuidedTour && <GuidedTour onClose={() => setShowGuidedTour(false)} />}
     </div>
   );
 };
