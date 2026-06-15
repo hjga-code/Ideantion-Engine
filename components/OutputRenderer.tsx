@@ -653,11 +653,50 @@ const exportMarkdown = (text: string, label: string, theme: DocTheme) => {
 };
 
 const exportPDF = (text: string, label: string, theme: DocTheme) => {
-  const win = window.open('', '_blank');
-  if (!win) { alert('Activa las ventanas emergentes para exportar PDF.'); return; }
-  win.document.write(buildDocumentHTML(text, label, theme, true));
-  win.document.close();
+  const iframe = document.createElement('iframe');
+  iframe.style.position = 'fixed';
+  iframe.style.right = '0';
+  iframe.style.bottom = '0';
+  iframe.style.width = '0';
+  iframe.style.height = '0';
+  iframe.style.border = '0';
+  iframe.style.outline = 'none';
+  iframe.style.pointerEvents = 'none';
+  iframe.style.zIndex = '-9999';
+
+  document.body.appendChild(iframe);
+
+  const doc = iframe.contentWindow?.document || iframe.contentDocument;
+  if (!doc) {
+    alert('Error al generar el PDF.');
+    document.body.removeChild(iframe);
+    return;
+  }
+
+  iframe.onload = () => {
+    setTimeout(() => {
+      try {
+        iframe.contentWindow?.focus();
+        iframe.contentWindow?.print();
+      } catch (e) {
+        console.error('Failed to print iframe:', e);
+        alert('Hubo un problema al abrir el diálogo de impresión. Intenta copiar el texto directamente.');
+      }
+      
+      // Remove the iframe after a delay to ensure print dialog completed
+      setTimeout(() => {
+        try {
+          document.body.removeChild(iframe);
+        } catch (e) {}
+      }, 5000);
+    }, 500);
+  };
+
+  doc.open();
+  doc.write(buildDocumentHTML(text, label, theme, false));
+  doc.close();
 };
+
 
 const exportDOC = (text: string, label: string, theme: DocTheme) => {
   const html = buildWordHTML(text, label, theme);
