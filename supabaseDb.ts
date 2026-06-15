@@ -89,6 +89,7 @@ export const getUserSettings = async (userId: string): Promise<GlobalSettings | 
     openRouterModel: data.open_router_model ?? 'anthropic/claude-sonnet-4-6',
     geminiModel: data.gemini_model ?? 'gemini-3.5-flash',
     providerName: data.provider_name ?? 'My Workspace',
+    tourCompleted: data.tour_completed ?? false,
   } as GlobalSettings;
 };
 
@@ -107,4 +108,26 @@ export const saveUserSettings = async (userId: string, settings: GlobalSettings)
     }, { onConflict: 'user_id' });
 
   if (error) console.error('saveUserSettings:', error);
+};
+
+// ─── TOUR ────────────────────────────────────────────────────────────────────
+
+export const markTourCompleted = async (userId: string): Promise<void> => {
+  const { error } = await supabase
+    .from('user_settings')
+    .upsert(
+      { user_id: userId, tour_completed: true },
+      { onConflict: 'user_id' }
+    );
+  if (error) console.error('markTourCompleted:', error);
+};
+
+export const getTourCompleted = async (userId: string): Promise<boolean> => {
+  const { data, error } = await supabase
+    .from('user_settings')
+    .select('tour_completed')
+    .eq('user_id', userId)
+    .single();
+  if (error || !data) return false;
+  return data.tour_completed ?? false;
 };

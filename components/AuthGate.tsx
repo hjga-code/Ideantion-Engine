@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { getSession, onAuthStateChange, type AppUser } from '../services/authService';
 import LoginScreen from './LoginScreen';
 import { GuidedTour } from './GuidedTour';
-
-const TOUR_KEY = 'thinklab_guided_tour_completed_v2';
+import { getTourCompleted, markTourCompleted } from '../supabaseDb';
 
 interface AuthGateProps {
   children: (user: AppUser) => React.ReactNode;
@@ -12,32 +11,40 @@ interface AuthGateProps {
 const AuthGate: React.FC<AuthGateProps> = ({ children }) => {
   const [user, setUser] = useState<AppUser | null>(null);
   const [loading, setLoading] = useState(true);
-  // Read localStorage synchronously — no race condition
   const [showTour, setShowTour] = useState<boolean>(false);
 
   useEffect(() => {
     // Check existing session on mount
-    getSession().then(u => {
+    getSession().then(async u => {
       setUser(u);
-      setLoading(false);
       // Show tour only after auth resolves and user is logged in
-      if (u && !localStorage.getItem(TOUR_KEY)) {
-        setShowTour(true);
+      if (u) {
+        const completed = await getTourCompleted(u.id);
+        if (!completed) setShowTour(true);
       }
+      setLoading(false);
     });
 
     // Listen for auth changes (login / logout / token refresh)
-    const unsubscribe = onAuthStateChange(u => {
+    const unsubscribe = onAuthStateChange(async u => {
       setUser(u);
-      setLoading(false);
       // Also trigger tour on fresh login via OAuth redirect
-      if (u && !localStorage.getItem(TOUR_KEY)) {
-        setShowTour(true);
+      if (u) {
+        const completed = await getTourCompleted(u.id);
+        if (!completed) setShowTour(true);
       }
+      setLoading(false);
     });
 
     return unsubscribe;
   }, []);
+
+  const handleTourClose = async () => {
+    if (user) {
+      await markTourCompleted(user.id);
+    }
+    setShowTour(false);
+  };
 
   if (loading) {
     return (
@@ -60,7 +67,7 @@ const AuthGate: React.FC<AuthGateProps> = ({ children }) => {
   return (
     <>
       {children(user)}
-      {showTour && <GuidedTour onClose={() => setShowTour(false)} />}
+      {showTour && <GuidedTour onClose={handleTourClose} />}
     </>
   );
 };

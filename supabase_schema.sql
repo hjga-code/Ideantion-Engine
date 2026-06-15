@@ -42,6 +42,7 @@ CREATE TABLE IF NOT EXISTS public.user_settings (
   open_router_key   TEXT DEFAULT '',
   open_router_model TEXT DEFAULT 'anthropic/claude-sonnet-4-6',
   provider_name     TEXT DEFAULT 'My Workspace',
+  tour_completed    BOOLEAN NOT NULL DEFAULT FALSE,
   updated_at        TIMESTAMPTZ DEFAULT NOW()
 );
 

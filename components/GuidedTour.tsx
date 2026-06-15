@@ -106,7 +106,7 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({ onClose }) => {
   };
 
   const handleComplete = () => {
-    localStorage.setItem('thinklab_guided_tour_completed_v2', 'true');
+    // Tour completion is persisted by AuthGate via the onClose callback
     onClose();
   };
 

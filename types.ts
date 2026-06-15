@@ -110,6 +110,7 @@ export interface GlobalSettings {
   openRouterModel: string;
   geminiModel: string;
   providerName: string;
+  tourCompleted?: boolean;
 }
 
 export interface ProcessingState {
