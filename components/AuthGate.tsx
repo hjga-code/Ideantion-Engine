@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { getSession, onAuthStateChange, type AppUser } from '../services/authService';
 import LoginScreen from './LoginScreen';
 import { GuidedTour } from './GuidedTour';
@@ -13,37 +13,57 @@ const AuthGate: React.FC<AuthGateProps> = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [showTour, setShowTour] = useState<boolean>(false);
 
+  /**
+   * Guard ref: once we've decided whether to show the tour (after the first
+   * successful DB read), we never query again for this page load.
+   * This prevents onAuthStateChange (which fires on every token refresh,
+   * ~hourly, and on every page reload) from re-opening the tour after the
+   * user has already dismissed it.
+   */
+  const tourDecidedRef = useRef(false);
+
+  const checkTour = async (userId: string) => {
+    if (tourDecidedRef.current) return; // already decided this page load
+    tourDecidedRef.current = true;
+    try {
+      const completed = await getTourCompleted(userId);
+      if (!completed) setShowTour(true);
+    } catch (e) {
+      console.error('checkTour:', e);
+    }
+  };
+
   useEffect(() => {
     // Check existing session on mount
     getSession().then(async u => {
       setUser(u);
-      // Show tour only after auth resolves and user is logged in
-      if (u) {
-        const completed = await getTourCompleted(u.id);
-        if (!completed) setShowTour(true);
-      }
+      if (u) await checkTour(u.id);
       setLoading(false);
     });
 
-    // Listen for auth changes (login / logout / token refresh)
+    // Listen for auth changes (login via OAuth redirect / logout / token refresh).
+    // We intentionally DO NOT re-check the tour here unless this is the first
+    // resolution (tourDecidedRef guards that).
     const unsubscribe = onAuthStateChange(async u => {
       setUser(u);
-      // Also trigger tour on fresh login via OAuth redirect
-      if (u) {
-        const completed = await getTourCompleted(u.id);
-        if (!completed) setShowTour(true);
-      }
+      if (u) await checkTour(u.id);
       setLoading(false);
     });
 
     return unsubscribe;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleTourClose = async () => {
-    if (user) {
-      await markTourCompleted(user.id);
-    }
+    // Hide tour immediately — don't wait for the DB write
     setShowTour(false);
+    if (user) {
+      try {
+        await markTourCompleted(user.id);
+      } catch (e) {
+        console.error('markTourCompleted:', e);
+      }
+    }
   };
 
   if (loading) {

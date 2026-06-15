@@ -612,7 +612,7 @@ const App: React.FC<AppProps> = ({ user }) => {
   };
 
   return (
-    <div className="flex h-[100dvh] w-full overflow-hidden bg-thinklab-bg text-thinklab-text font-sans">
+    <div className="flex h-[100dvh] w-full overflow-hidden bg-thinklab-bg text-thinklab-text font-sans isolate">
       
       {/* Notifications */}
       {toast && ( pipWindow ? createPortal(<Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />, pipWindow.document.body) : <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} /> )}
@@ -687,7 +687,7 @@ const App: React.FC<AppProps> = ({ user }) => {
 
         {/* --- SCROLLABLE CHAT AREA --- */}
         <div
-          className="flex-1 overflow-y-auto p-4 md:p-8 flex flex-col items-center min-h-0 pb-80 scroll-smooth" 
+          className="flex-1 overflow-y-auto p-4 md:p-8 flex flex-col items-center min-h-0 pb-80 scroll-smooth bg-thinklab-bg" 
           onDragOver={(e) => e.preventDefault()} 
           onDrop={(e) => { 
             e.preventDefault(); 
