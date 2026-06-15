@@ -52,16 +52,16 @@ const HistorySidebar: React.FC<HistorySidebarProps> = ({
 
   return (
     <>
-      {/* Mobile Overlay */}
       <div 
-        className={`fixed inset-0 bg-black/50 z-20 md:hidden backdrop-blur-sm transition-opacity duration-300 ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+        className={`fixed inset-0 bg-black/60 z-20 md:hidden transition-opacity duration-300 ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
         onClick={toggleSidebar}
       />
 
       {/* Sidebar Container */}
       <div className={`
-        fixed md:relative z-30 flex flex-col h-full bg-thinklab-bg border-r border-thinklab-border transition-all duration-300 ease-in-out overflow-hidden
-        ${isOpen ? 'w-72 translate-x-0' : 'w-0 -translate-x-full md:translate-x-0 md:w-0'}
+        fixed md:relative z-30 flex flex-col h-[100dvh] md:h-full bg-thinklab-bg border-r border-thinklab-border overflow-hidden
+        transition-transform md:transition-all duration-300 ease-in-out
+        w-72 ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0 md:w-0'}
       `}>
         <div className="w-72 flex flex-col h-full"> {/* Inner container with fixed width to prevent content squashing during transition */}
             <div className="p-4 border-b border-thinklab-border flex items-center justify-between">

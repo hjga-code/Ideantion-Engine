@@ -612,7 +612,7 @@ const App: React.FC<AppProps> = ({ user }) => {
   };
 
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-thinklab-bg text-thinklab-text font-sans">
+    <div className="flex h-[100dvh] w-full overflow-hidden bg-thinklab-bg text-thinklab-text font-sans">
       
       {/* Notifications */}
       {toast && ( pipWindow ? createPortal(<Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />, pipWindow.document.body) : <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} /> )}
@@ -631,23 +631,29 @@ const App: React.FC<AppProps> = ({ user }) => {
       <HistorySidebar sessions={sessions} activeSessionId={currentSessionId} onSelect={loadSession} onNew={resetSession} onDelete={handleDeleteSession} onRename={handleRenameSession} isOpen={isSidebarOpen} toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
 
       <main className="flex-1 flex flex-col relative w-full h-full min-h-0 bg-thinklab-bg">
-        <header className="flex-shrink-0 flex items-center justify-between p-4 border-b border-thinklab-border bg-thinklab-bg/80 backdrop-blur-md z-10">
+        <header className="flex-shrink-0 flex items-center justify-between p-4 border-b border-thinklab-border bg-thinklab-bg z-10">
           <div className="flex items-center gap-3">
              <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-2 text-thinklab-text hover:text-white transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" /></svg>
              </button>
              <span className="text-[11px] font-mono font-bold tracking-[0.2em] text-white uppercase select-none">IDEATION ENGINE</span>
           </div>
-          <div className="hidden md:flex items-center gap-3 md:ml-auto">
-            {/* Trial counter pill */}
-            <div className="flex items-center gap-1.5 px-3 py-1 bg-thinklab-surface border border-thinklab-border rounded-full">
-              <div className={`w-1.5 h-1.5 rounded-full ${sessionCount >= MAX_SESSIONS ? 'bg-red-400' : sessionCount >= MAX_SESSIONS - 2 ? 'bg-amber-400' : 'bg-thinklab-cyan shadow-[0_0_8px_#00d4ff]'}`}></div>
-              <span className="text-[10px] font-mono text-thinklab-text">{sessionCount}/{MAX_SESSIONS} chats</span>
+
+          {/* Right side: desktop shows full menu, mobile shows avatar+logout only */}
+          <div className="flex items-center gap-2 ml-auto">
+
+            {/* Desktop-only extras */}
+            <div className="hidden md:flex items-center gap-3">
+              <div className="flex items-center gap-1.5 px-3 py-1 bg-thinklab-surface border border-thinklab-border rounded-full">
+                <div className={`w-1.5 h-1.5 rounded-full ${sessionCount >= MAX_SESSIONS ? 'bg-red-400' : sessionCount >= MAX_SESSIONS - 2 ? 'bg-amber-400' : 'bg-thinklab-cyan shadow-[0_0_8px_#00d4ff]'}`}></div>
+                <span className="text-[10px] font-mono text-thinklab-text">{sessionCount}/{MAX_SESSIONS} chats</span>
+              </div>
+              <button onClick={() => setIsWidgetMode(true)} className="flex items-center gap-2 px-3 py-1.5 text-xs font-mono border border-thinklab-border rounded hover:bg-thinklab-surface transition-all text-thinklab-text">
+                 WIDGET
+              </button>
             </div>
-            <button onClick={() => setIsWidgetMode(true)} className="flex items-center gap-2 px-3 py-1.5 text-xs font-mono border border-thinklab-border rounded hover:bg-thinklab-surface transition-all text-thinklab-text">
-               WIDGET
-            </button>
-            {/* User avatar + logout */}
+
+            {/* Always visible: avatar + logout */}
             <div className="flex items-center gap-2">
               {user.avatarUrl ? (
                 <img src={user.avatarUrl} alt={user.name} className="w-7 h-7 rounded-full border border-white/10" />
@@ -667,8 +673,10 @@ const App: React.FC<AppProps> = ({ user }) => {
                 </svg>
               </button>
             </div>
+
           </div>
         </header>
+
 
         {/* Trial Banner */}
         <TrialBanner
@@ -917,13 +925,13 @@ const App: React.FC<AppProps> = ({ user }) => {
         </div>
 
         {/* --- COLLAPSIBLE INPUT PANEL (REDESIGNED) --- */}
-        <div className={`fixed bottom-0 left-0 w-full z-20 transition-transform duration-300 ease-in-out bg-[#050505]/80 backdrop-blur-2xl border-t border-white/5 shadow-2xl ${isSettingsPanelOpen ? 'translate-y-0' : 'translate-y-[100%]'}`}>
+        <div className={`fixed bottom-0 left-0 w-full z-20 transition-transform duration-300 ease-in-out bg-[#050505] border-t border-white/5 shadow-2xl ${isSettingsPanelOpen ? 'translate-y-0' : 'translate-y-[100%]'}`}>
           {/* ... Panel Content ... */}
           {/* Toggle Tab - High-Tech Tab */}
           <div className="absolute -top-8 left-1/2 -translate-x-1/2 w-full flex justify-center pointer-events-none">
              <button 
                 onClick={() => setIsSettingsPanelOpen(!isSettingsPanelOpen)}
-                className="pointer-events-auto bg-[#0a0a0a] backdrop-blur-lg border border-b-0 border-white/10 rounded-t-xl px-8 py-2 text-[10px] font-mono font-bold text-gray-400 hover:text-white transition-all shadow-[0_-5px_20px_rgba(0,0,0,0.5)] flex items-center gap-2 group tracking-widest"
+                className="pointer-events-auto bg-[#0a0a0a] border border-b-0 border-white/10 rounded-t-xl px-8 py-2 text-[10px] font-mono font-bold text-gray-400 hover:text-white transition-all shadow-[0_-5px_20px_rgba(0,0,0,0.5)] flex items-center gap-2 group tracking-widest"
              >
                 {isSettingsPanelOpen ? (
                    <><div className="w-2 h-0.5 bg-gray-500 group-hover:bg-white rounded-full transition-colors"></div> OCULTAR</>
