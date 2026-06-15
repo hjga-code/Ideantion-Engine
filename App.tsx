@@ -687,7 +687,7 @@ const App: React.FC<AppProps> = ({ user }) => {
 
         {/* --- SCROLLABLE CHAT AREA --- */}
         <div
-          className="flex-1 overflow-y-auto p-4 md:p-8 flex flex-col items-center min-h-0 pb-80 scroll-smooth" 
+          className="flex-1 overflow-y-auto p-4 md:p-8 flex flex-col items-center min-h-0 pb-80 scroll-smooth bg-thinklab-bg" 
           onDragOver={(e) => e.preventDefault()} 
           onDrop={(e) => { 
             e.preventDefault(); 
