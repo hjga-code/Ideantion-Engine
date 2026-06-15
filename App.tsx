@@ -924,26 +924,24 @@ const App: React.FC<AppProps> = ({ user }) => {
           </div>
         </div>
 
-        {/* --- INPUT PANEL TAB (always visible, simple fixed button) --- */}
-        <div className="fixed bottom-0 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
-          <button
-            onClick={() => setIsSettingsPanelOpen(!isSettingsPanelOpen)}
-            className="pointer-events-auto bg-[#0a0a0a] border border-b-0 border-white/10 rounded-t-xl px-8 py-2 text-[10px] font-mono font-bold text-gray-400 hover:text-white transition-colors shadow-[0_-5px_20px_rgba(0,0,0,0.5)] flex items-center gap-2 group tracking-widest"
-          >
-            {isSettingsPanelOpen ? (
-              <><div className="w-2 h-0.5 bg-gray-500 group-hover:bg-white rounded-full transition-colors"></div> OCULTAR</>
-            ) : (
-              <><div className="w-2 h-0.5 bg-gray-500 group-hover:bg-white rounded-full transition-colors"></div> INPUT PANEL</>
-            )}
-          </button>
-        </div>
+        {/* --- COLLAPSIBLE INPUT PANEL (REDESIGNED) --- */}
+        <div className={`fixed bottom-0 left-0 w-full z-20 transition-transform duration-300 ease-in-out bg-[#050505] border-t border-white/5 shadow-2xl ${isSettingsPanelOpen ? 'translate-y-0' : 'translate-y-[100%]'}`}>
+          {/* ... Panel Content ... */}
+          {/* Toggle Tab - High-Tech Tab */}
+          <div className="absolute -top-8 left-1/2 -translate-x-1/2 w-full flex justify-center pointer-events-none">
+             <button 
+                onClick={() => setIsSettingsPanelOpen(!isSettingsPanelOpen)}
+                className="pointer-events-auto bg-[#0a0a0a] border border-b-0 border-white/10 rounded-t-xl px-8 py-2 text-[10px] font-mono font-bold text-gray-400 hover:text-white transition-all shadow-[0_-5px_20px_rgba(0,0,0,0.5)] flex items-center gap-2 group tracking-widest"
+             >
+                {isSettingsPanelOpen ? (
+                   <><div className="w-2 h-0.5 bg-gray-500 group-hover:bg-white rounded-full transition-colors"></div> OCULTAR</>
+                ) : (
+                   <><div className="w-2 h-0.5 bg-gray-500 group-hover:bg-white rounded-full transition-colors"></div> INPUT PANEL</>
+                )}
+             </button>
+          </div>
 
-        {/* --- COLLAPSIBLE INPUT PANEL (only in DOM when open) --- */}
-        {isSettingsPanelOpen && (
-        <div className="fixed bottom-0 left-0 w-full z-[19] bg-[#050505] border-t border-white/5 shadow-2xl animate-fade-in">
-          <div className="h-8" /> {/* spacer so content doesn't overlap the tab */}
           <div className="w-full">
-
               {/* PROVIDER SETTINGS */}
               {showProviderSettings && (
                 <div className="w-full bg-[#0a0a0a]/50 border-b border-white/5 p-4 animate-fade-in">
@@ -1142,10 +1140,8 @@ const App: React.FC<AppProps> = ({ user }) => {
               </div>
           </div>
         </div>
-        )} {/* end isSettingsPanelOpen */}
 
       </main>
-
     </div>
   );
 };
