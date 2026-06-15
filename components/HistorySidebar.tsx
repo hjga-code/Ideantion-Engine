@@ -69,7 +69,8 @@ const HistorySidebar: React.FC<HistorySidebarProps> = ({
         fixed md:relative z-30 flex-col h-[100dvh] md:h-full
         bg-thinklab-bg border-r border-thinklab-border overflow-hidden
         md:transition-all md:duration-300 md:ease-in-out
-        ${isOpen ? 'flex w-72' : 'hidden md:flex md:w-0'}
+        w-72 md:${isOpen ? 'w-72' : 'w-0'}
+        ${isOpen ? 'flex' : 'hidden md:flex'}
       `}>
         <div className="w-72 flex flex-col h-full">
             <div className="p-4 border-b border-thinklab-border flex items-center justify-between">
