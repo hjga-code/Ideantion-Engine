@@ -4,21 +4,55 @@ import { signInWithGoogle } from '../services/authService';
 const LoginScreen: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [lang, setLang] = useState<'en' | 'es'>(() => {
+    const saved = localStorage.getItem('thinklab_ui_lang');
+    return (saved === 'es' || saved === 'en') ? saved : 'en';
+  });
+
+  const handleLangToggle = () => {
+    const next = lang === 'en' ? 'es' : 'en';
+    setLang(next);
+    localStorage.setItem('thinklab_ui_lang', next);
+  };
+
+  const isEs = lang === 'es';
+  const subtitle = isEs ? 'Tu estudio creativo con IA' : 'Your AI-powered creative studio';
+  const badge = isEs ? 'Prueba gratuita · 10 chats incluidos' : 'Free trial · 10 chats included';
+  const f1 = isEs ? '8 workflows especializados con IA' : '8 specialized AI workflows';
+  const f2 = isEs ? 'Exportación a PDF, DOC, CSV y Markdown' : 'Export to PDF, DOC, CSV & Markdown';
+  const f3 = isEs ? 'Tus chats guardados de forma privada' : 'Your chats saved privately';
+  const f4 = isEs ? 'Gemini 3.5 + OpenRouter (8 modelos)' : 'Gemini 3.5 + OpenRouter (8 models)';
+  const divider = isEs ? 'Acceder con' : 'Sign in with';
+  const btnConnecting = isEs ? 'Conectando...' : 'Connecting...';
+  const btnContinue = isEs ? 'Continuar con Google' : 'Continue with Google';
+  const footerText = isEs 
+    ? 'Al continuar, aceptas que tus chats se almacenan de forma segura y privada con tu cuenta de Google.'
+    : 'By continuing, you agree that your chats are stored securely and privately with your Google account.';
+  const errLogin = isEs ? 'No se pudo iniciar sesión. Intenta de nuevo.' : 'Failed to sign in. Please try again.';
 
   const handleGoogleLogin = async () => {
     setLoading(true);
     setError(null);
     try {
       await signInWithGoogle();
-      // Supabase redirects the browser — no further action needed here
     } catch (e) {
-      setError('No se pudo iniciar sesión. Intenta de nuevo.');
+      setError(errLogin);
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#080808] flex items-center justify-center relative overflow-hidden">
+    <div className="min-h-screen bg-[#080808] flex flex-col items-center justify-center relative overflow-hidden">
+      {/* Language Toggle in Top-Right Corner */}
+      <div className="absolute top-6 right-6 z-20">
+        <button 
+          onClick={handleLangToggle}
+          className="px-3 py-1.5 text-xs font-mono border border-white/10 rounded-xl bg-white/[0.02] hover:bg-white/10 text-white/60 hover:text-white transition-all flex items-center gap-1.5"
+        >
+          🌐 {isEs ? 'ENGLISH' : 'ESPAÑOL'}
+        </button>
+      </div>
+
       {/* Ambient background */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-[-20%] left-[10%] w-[600px] h-[600px] rounded-full bg-violet-900/10 blur-[120px]" />
@@ -51,7 +85,7 @@ const LoginScreen: React.FC = () => {
             Ideation Engine
           </h1>
           <p className="text-[13px] text-white/40 font-light">
-            Tu estudio creativo con IA
+            {subtitle}
           </p>
         </div>
 
@@ -61,16 +95,16 @@ const LoginScreen: React.FC = () => {
           {/* Trial badge */}
           <div className="flex items-center gap-2 bg-violet-950/60 border border-violet-500/20 rounded-full px-4 py-2 mb-6 w-fit mx-auto">
             <div className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse"></div>
-            <span className="text-[11px] font-mono text-violet-300 tracking-wide">Prueba gratuita · 10 chats incluidos</span>
+            <span className="text-[11px] font-mono text-violet-300 tracking-wide">{badge}</span>
           </div>
 
           {/* Features */}
           <ul className="space-y-2.5 mb-7">
             {[
-              { icon: '⚡', text: '8 workflows especializados con IA' },
-              { icon: '📄', text: 'Exportación a PDF, DOC, CSV y Markdown' },
-              { icon: '🔒', text: 'Tus chats guardados de forma privada' },
-              { icon: '🤖', text: 'Gemini 3.5 + OpenRouter (8 modelos)' },
+              { icon: '⚡', text: f1 },
+              { icon: '📄', text: f2 },
+              { icon: '🔒', text: f3 },
+              { icon: '🤖', text: f4 },
             ].map(f => (
               <li key={f.text} className="flex items-start gap-2.5">
                 <span className="text-sm mt-0.5">{f.icon}</span>
@@ -82,7 +116,7 @@ const LoginScreen: React.FC = () => {
           {/* Divider */}
           <div className="flex items-center gap-3 mb-6">
             <div className="flex-1 h-px bg-white/[0.06]"></div>
-            <span className="text-[10px] font-mono text-white/20 uppercase tracking-widest">Acceder con</span>
+            <span className="text-[10px] font-mono text-white/20 uppercase tracking-widest">{divider}</span>
             <div className="flex-1 h-px bg-white/[0.06]"></div>
           </div>
 
@@ -99,7 +133,7 @@ const LoginScreen: React.FC = () => {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
                 </svg>
-                Conectando...
+                {btnConnecting}
               </>
             ) : (
               <>
@@ -110,7 +144,7 @@ const LoginScreen: React.FC = () => {
                   <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
                   <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
                 </svg>
-                Continuar con Google
+                {btnContinue}
               </>
             )}
           </button>
@@ -123,7 +157,7 @@ const LoginScreen: React.FC = () => {
 
         {/* Footer */}
         <p className="text-center text-[10.5px] text-white/20 mt-6 leading-relaxed">
-          Al continuar, aceptas que tus chats se almacenan<br/>de forma segura y privada con tu cuenta de Google.
+          {footerText}
         </p>
       </div>
     </div>

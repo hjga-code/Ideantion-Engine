@@ -47,23 +47,23 @@ export const generateSessionTitle = async (
 ): Promise<string> => {
     try {
         const apiKey = geminiKey || process.env.API_KEY;
-        if (!apiKey) return "Sesión";
+        if (!apiKey) return "Session";
         const ai = new GoogleGenAI({ apiKey });
         
         const response = await ai.models.generateContent({
             model: 'gemini-3.5-flash', 
             contents: [{
                 role: 'user',
-                parts: [{ text: `Genera un título extremadamente conciso (máximo 5 palabras) que resuma el tema de esta interacción. 
-                OUTPUT SOLO EL TÍTULO. SIN comillas. SIN prefijos.
+                parts: [{ text: `Generate an extremely concise title (max 5 words) summarizing the topic of this interaction.
+                OUTPUT ONLY THE TITLE. NO quotes. NO prefixes. Match the language of the user's input.
                 
-                Usuario: ${userText.slice(0, 500) || "[Input Multimodal/Imagen/Audio]"}
-                IA: ${aiText.slice(0, 500)}...` }]
+                User: ${userText.slice(0, 500) || "[Multimodal/Image/Audio Input]"}
+                AI: ${aiText.slice(0, 500)}...` }]
             }]
         });
-        return response.text?.trim() || "Sesión";
+        return response.text?.trim() || "Session";
     } catch (e) {
-        return "Sesión";
+        return "Session";
     }
 };
 
@@ -82,7 +82,7 @@ export const processContent = async (
   try {
     const apiKey = geminiKey || process.env.API_KEY;
     if (!apiKey) {
-        throw new Error("Falta la API Key de Google Gemini. Agrégala en el panel de configuración.");
+        throw new Error("Missing Google Gemini API Key. Add it in the settings panel.");
     }
 
     const ai = new GoogleGenAI({ apiKey });
@@ -101,13 +101,13 @@ export const processContent = async (
     ${activeSkill.content}
     --- END OF SKILL.MD ---
 
-    [[RUNTIME PARAMETERS]]
-    - TARGET LANGUAGE: ${language !== 'AUTO' ? LANGUAGES[language] : 'DETECTAR (Mantener original)'}
-    - OUTPUT FORMAT REQ: ${format}
-    - PRESET CONTEXT: ${preset}
+    [[RUNTIME PARAMETERS — CRITICAL OVERRIDES]]
+    - ⚠️ OUTPUT LANGUAGE: ${language !== 'AUTO' ? `FORCE OUTPUT IN ${LANGUAGES[language]} — regardless of the user input language` : "AUTO-DETECT: You MUST detect the language the user wrote in and output EVERYTHING — all labels, headers, content, tables, and text — in that EXACT SAME language. English input → English output. Spanish input → Spanish output. This is a HARD CONSTRAINT."}
+    - OUTPUT FORMAT: ${format}
+    - ACTIVE PRESET: ${preset}
     
     [[INSTRUCTION FOR MODEL]]
-    If an image is provided, analyze its layout, composition, and colors deeply. Use this analysis to inform the JSON structure you generate.
+    If an image is provided, analyze its layout, composition, and colors deeply. Use this analysis to inform the structure you generate.
     `;
 
     // 2. Build Message History for Gemini
@@ -203,7 +203,7 @@ export const processContent = async (
     });
 
     if (!response || !response.text) {
-        throw new Error("La IA no devolvió contenido.");
+        throw new Error("The AI returned no content.");
     }
 
     // CLEANUP: If thinking blocks are included in the response text (despite config), strip them out if we asked for JSON.

@@ -5,6 +5,7 @@ interface OutputRendererProps {
   isTableContent?: boolean;
   module?: string;
   preset?: string;
+  uiLanguage?: 'en' | 'es';
 }
 
 // ─── SMART TITLE ENGINE ──────────────────────────────────────────────────────
@@ -14,104 +15,173 @@ interface OutputRendererProps {
 // Layer 4: Module default
 
 // L3 — Preset lookup table
-const PRESET_TITLES: Record<string, string> = {
-  // Content Generation
-  SOCIAL_REEL:            'Script de Reel',
-  SOCIAL_CAROUSEL:        'Carrusel de Contenido',
-  SOCIAL_POST_COPY:       'Post + Caption',
-  CONTENT_EDUCATIONAL:    'Contenido Educativo',
-  CONTENT_ADVERTISING:    'Contenido Publicitario',
-  CONTENT_PERSONAL_BRAND: 'Marca Personal',
-  CONTENT_CREATOR:        'Guín de Creador',
-  // Smart Calendar
-  CALENDAR_CONTENT: 'Calendario de Contenidos',
-  CALENDAR_TASKS:   'Plan de Tareas',
-  CALENDAR_PROJECT: 'Calendario de Proyecto',
-  CALENDAR_LAUNCH:  'Plan de Lanzamiento',
-  CALENDAR_WEEKLY:  'Planificación Semanal',
-  // SEO & Growth
-  SEO_AUDIT:               'Auditoría SEO',
-  AD_CAMPAIGN:             'Campaña Publicitaria',
-  KEYWORD_STRATEGY:        'Estrategia de Keywords',
-  LANDING_COPY:            'Copy para Landing',
-  GEO_OPTIMIZATION:        'Optimización GEO / AI Search',
-  LINKEDIN_AUTHORITY:      'Arquitectura LinkedIn',
-  PROGRAMMATIC_SEO_STRUCT: 'SEO Programático',
-  // Voice to Structure
-  NOTES:          'Transcripción Estructurada',
-  JSON_SCHEMA:    'Esquema JSON',
-  KNOWLEDGE_GRAPH:'Grafo de Conocimiento',
-  MEETING_INTEL:  'Actas de Reunión',
-  LEGAL_EXTRACT:  'Extracción Legal',
-  // Pro Refinement
-  EMAIL:                'Email Profesional',
-  COPYWRITING:          'Copy Persuasivo',
-  FOUNDER_MODE:         'Mensaje de Founder',
-  UX_MICROCOPY:         'Microcopy UX',
-  STORYTELLING_MASTER:  'Historia de Marca',
-  // Table Engine
-  CONTENT_CALENDAR: 'Calendario de Contenidos',
-  DATA_TABLE:       'Tabla de Datos',
-  PRICING_TABLE:    'Tabla de Precios',
-  FINANCIAL_MODEL:  'Modelo Financiero',
-  PRODUCT_ROADMAP:  'Product Roadmap',
-  COMPARISON_MATRIX:'Matriz Comparativa',
-  // Universal Prompt
-  PROMPT:              'Prompt para Imagen',
-  SYSTEM_PROMPT:       'System Instruction',
-  SUPER_AGENT_SYSTEM:  'Arquitectura de Agente',
-  VIDEO_GEN_SCRIPT:    'Prompt de Video',
-  COT_OPTIMIZATION:    'Prompt Optimizado',
-  // Ideation
-  BLUE_OCEAN:          'Estrategia Blue Ocean',
-  STARTUP_VALIDATION:  'Validación de Startup',
-  PRE_MORTEM:          'Análisis Pre-Mortem',
-  // General
-  GENERAL: 'Documento',
+const PRESET_TITLES: Record<'en' | 'es', Record<string, string>> = {
+  en: {
+    // Content Generation
+    SOCIAL_REEL:            'Reel Script',
+    SOCIAL_CAROUSEL:        'Content Carousel',
+    SOCIAL_POST_COPY:       'Post + Caption',
+    CONTENT_EDUCATIONAL:    'Educational Content',
+    CONTENT_ADVERTISING:    'Advertising Content',
+    CONTENT_PERSONAL_BRAND: 'Personal Brand',
+    CONTENT_CREATOR:        'Creator Script',
+    // Smart Calendar
+    CALENDAR_CONTENT: 'Content Calendar',
+    CALENDAR_TASKS:   'Task Plan',
+    CALENDAR_PROJECT: 'Project Calendar',
+    CALENDAR_LAUNCH:  'Launch Plan',
+    CALENDAR_WEEKLY:  'Weekly Planning',
+    // SEO & Growth
+    SEO_AUDIT:               'SEO Audit',
+    AD_CAMPAIGN:             'Ad Campaign',
+    KEYWORD_STRATEGY:        'Keyword Strategy',
+    LANDING_COPY:            'Landing Page Copy',
+    GEO_OPTIMIZATION:        'GEO / AI Search Optimization',
+    LINKEDIN_AUTHORITY:      'LinkedIn Architecture',
+    PROGRAMMATIC_SEO_STRUCT: 'Programmatic SEO',
+    // Voice to Structure
+    NOTES:          'Structured Transcription',
+    JSON_SCHEMA:    'JSON Schema',
+    KNOWLEDGE_GRAPH:'Knowledge Graph',
+    MEETING_INTEL:  'Meeting Minutes',
+    LEGAL_EXTRACT:  'Legal Extraction',
+    // Pro Refinement
+    EMAIL:                'Professional Email',
+    COPYWRITING:          'Persuasive Copy',
+    FOUNDER_MODE:         'Founder Message',
+    UX_MICROCOPY:         'UX Microcopy',
+    STORYTELLING_MASTER:  'Brand Story',
+    // Table Engine
+    CONTENT_CALENDAR: 'Content Calendar',
+    DATA_TABLE:       'Data Table',
+    PRICING_TABLE:    'Pricing Table',
+    FINANCIAL_MODEL:  'Financial Model',
+    PRODUCT_ROADMAP:  'Product Roadmap',
+    COMPARISON_MATRIX:'Comparison Matrix',
+    // Universal Prompt
+    PROMPT:              'Image Prompt',
+    SYSTEM_PROMPT:       'System Instruction',
+    SUPER_AGENT_SYSTEM:  'Agent Architecture',
+    VIDEO_GEN_SCRIPT:    'Video Prompt',
+    COT_OPTIMIZATION:    'Optimized Prompt',
+    // Ideation
+    BLUE_OCEAN:          'Blue Ocean Strategy',
+    STARTUP_VALIDATION:  'Startup Validation',
+    PRE_MORTEM:          'Pre-Mortem Analysis',
+    // General
+    GENERAL: 'Document',
+  },
+  es: {
+    // Content Generation
+    SOCIAL_REEL:            'Script de Reel',
+    SOCIAL_CAROUSEL:        'Carrusel de Contenido',
+    SOCIAL_POST_COPY:       'Post + Caption',
+    CONTENT_EDUCATIONAL:    'Contenido Educativo',
+    CONTENT_ADVERTISING:    'Contenido Publicitario',
+    CONTENT_PERSONAL_BRAND: 'Marca Personal',
+    CONTENT_CREATOR:        'Guion de Creador',
+    // Smart Calendar
+    CALENDAR_CONTENT: 'Calendario de Contenidos',
+    CALENDAR_TASKS:   'Plan de Tareas',
+    CALENDAR_PROJECT: 'Calendario de Proyecto',
+    CALENDAR_LAUNCH:  'Plan de Lanzamiento',
+    CALENDAR_WEEKLY:  'Planificación Semanal',
+    // SEO & Growth
+    SEO_AUDIT:               'Auditoría SEO',
+    AD_CAMPAIGN:             'Campaña Publicitaria',
+    KEYWORD_STRATEGY:        'Estrategia de Keywords',
+    LANDING_COPY:            'Copy para Landing',
+    GEO_OPTIMIZATION:        'Optimización GEO / AI Search',
+    LINKEDIN_AUTHORITY:      'Arquitectura LinkedIn',
+    PROGRAMMATIC_SEO_STRUCT: 'SEO Programático',
+    // Voice to Structure
+    NOTES:          'Transcripción Estructurada',
+    JSON_SCHEMA:    'Esquema JSON',
+    KNOWLEDGE_GRAPH:'Grafo de Conocimiento',
+    MEETING_INTEL:  'Actas de Reunión',
+    LEGAL_EXTRACT:  'Extracción Legal',
+    // Pro Refinement
+    EMAIL:                'Email Profesional',
+    COPYWRITING:          'Copy Persuasivo',
+    FOUNDER_MODE:         'Mensaje de Founder',
+    UX_MICROCOPY:         'Microcopy UX',
+    STORYTELLING_MASTER:  'Historia de Marca',
+    // Table Engine
+    CONTENT_CALENDAR: 'Calendario de Contenidos',
+    DATA_TABLE:       'Tabla de Datos',
+    PRICING_TABLE:    'Tabla de Precios',
+    FINANCIAL_MODEL:  'Modelo Financiero',
+    PRODUCT_ROADMAP:  'Product Roadmap',
+    COMPARISON_MATRIX:'Matriz Comparativa',
+    // Universal Prompt
+    PROMPT:              'Prompt para Imagen',
+    SYSTEM_PROMPT:       'System Instruction',
+    SUPER_AGENT_SYSTEM:  'Arquitectura de Agente',
+    VIDEO_GEN_SCRIPT:    'Prompt de Video',
+    COT_OPTIMIZATION:    'Prompt Optimizado',
+    // Ideation
+    BLUE_OCEAN:          'Estrategia Blue Ocean',
+    STARTUP_VALIDATION:  'Validación de Startup',
+    PRE_MORTEM:          'Análisis Pre-Mortem',
+    // General
+    GENERAL: 'Documento',
+  }
 };
 
 // L4 — Module default titles
-const MODULE_TITLES: Record<string, string> = {
-  CODE:      'Contenido Generado',
-  DESIGN:    'Calendario',
-  SEO:       'Análisis SEO',
-  STRUCTURE: 'Estructura de Datos',
-  WRITING:   'Documento de Texto',
-  TABLES:    'Tabla de Datos',
-  PROMPT:    'Prompt',
-  IDEATION:  'Sesión de Ideación',
+const MODULE_TITLES: Record<'en' | 'es', Record<string, string>> = {
+  en: {
+    CODE:      'Generated Content',
+    DESIGN:    'Calendar',
+    SEO:       'SEO Analysis',
+    STRUCTURE: 'Data Structure',
+    WRITING:   'Text Document',
+    TABLES:    'Data Table',
+    PROMPT:    'Prompt',
+    IDEATION:  'Ideation Session',
+  },
+  es: {
+    CODE:      'Contenido Generado',
+    DESIGN:    'Calendario',
+    SEO:       'Análisis SEO',
+    STRUCTURE: 'Estructura de Datos',
+    WRITING:   'Documento de Texto',
+    TABLES:    'Tabla de Datos',
+    PROMPT:    'Prompt',
+    IDEATION:  'Sesión de Ideación',
+  }
 };
 
 // L2 — Detect document type from content patterns
-const detectFromContent = (content: string): string | null => {
+const detectFromContent = (content: string, lang: 'en' | 'es' = 'en'): string | null => {
   // Calendar / planning tables
-  if (/\|\s*(Semana|Week|Lunes|Monday|Martes|Tuesday)/i.test(content))  return 'Calendario de Contenidos';
-  if (/\|\s*(Sprint|Fase|Phase|Entregable|Deliverable)/i.test(content)) return 'Calendario de Proyecto';
-  if (/\|\s*(Prioridad|Priority|GTD|Contexto|@computadora)/i.test(content)) return 'Plan de Tareas GTD';
-  if (/Pre-lanzamiento|Pre-launch|Checklist de Lanzamiento/i.test(content)) return 'Plan de Lanzamiento';
-  if (/Bloque Horario|Deep Work|Intenciones de la Semana/i.test(content)) return 'Planificación Semanal';
+  if (/\|\s*(Semana|Week|Lunes|Monday|Martes|Tuesday)/i.test(content))  return lang === 'es' ? 'Calendario de Contenidos' : 'Content Calendar';
+  if (/\|\s*(Sprint|Fase|Phase|Entregable|Deliverable)/i.test(content)) return lang === 'es' ? 'Calendario de Proyecto' : 'Project Calendar';
+  if (/\|\s*(Prioridad|Priority|GTD|Contexto|@computadora)/i.test(content)) return lang === 'es' ? 'Plan de Tareas GTD' : 'GTD Task Plan';
+  if (/Pre-lanzamiento|Pre-launch|Checklist de Lanzamiento/i.test(content)) return lang === 'es' ? 'Plan de Lanzamiento' : 'Launch Plan';
+  if (/Bloque Horario|Deep Work|Intenciones de la Semana/i.test(content)) return lang === 'es' ? 'Planificación Semanal' : 'Weekly Planning';
   // Content formats
-  if (/\b(HOOK|GANCHO)\b[:\s]|\bCTA\b[:\s]/i.test(content))            return 'Script de Reel';
-  if (/Slide\s+\d+|Diapositiva\s+\d+|SLIDE\s+\d+/i.test(content))     return 'Carrusel de Contenido';
-  if (/\bCaption\b[:\s]|\bCAPTION\b[:\s]/i.test(content))              return 'Post + Caption';
+  if (/\b(HOOK|GANCHO)\b[:\s]|\bCTA\b[:\s]/i.test(content))            return lang === 'es' ? 'Script de Reel' : 'Reel Script';
+  if (/Slide\s+\d+|Diapositiva\s+\d+|SLIDE\s+\d+/i.test(content))     return lang === 'es' ? 'Carrusel de Contenido' : 'Content Carousel';
+  if (/\bCaption\b[:\s]|\bCAPTION\b[:\s]/i.test(content))              return lang === 'es' ? 'Post + Caption' : 'Post + Caption';
   // Financial / data
-  if (/P&amp;L|Revenue|EBITDA|Unit Economics|LTV|CAC/i.test(content))  return 'Modelo Financiero';
-  if (/\|\s*(Keyword|Palabra Clave).*\|\s*(Volume|Vol\.)/i.test(content)) return 'Estrategia de Keywords';
-  if (/\b(CTR|ROAS|CPM|CPA)\b/i.test(content))                         return 'Campaña Publicitaria';
-  if (/\|\s*(Precio|Price|Plan|Tier)/i.test(content))                   return 'Tabla de Precios';
-  if (/\|\s*(Tarea|Hito|Milestone|Task)/i.test(content))               return 'Roadmap de Producto';
+  if (/P&amp;L|Revenue|EBITDA|Unit Economics|LTV|CAC/i.test(content))  return lang === 'es' ? 'Modelo Financiero' : 'Financial Model';
+  if (/\|\s*(Keyword|Palabra Clave).*\|\s*(Volume|Vol\.)/i.test(content)) return lang === 'es' ? 'Estrategia de Keywords' : 'Keyword Strategy';
+  if (/\b(CTR|ROAS|CPM|CPA)\b/i.test(content))                         return lang === 'es' ? 'Campaña Publicitaria' : 'Ad Campaign';
+  if (/\|\s*(Precio|Price|Plan|Tier)/i.test(content))                   return lang === 'es' ? 'Tabla de Precios' : 'Pricing Table';
+  if (/\|\s*(Tarea|Hito|Milestone|Task)/i.test(content))               return lang === 'es' ? 'Roadmap de Producto' : 'Product Roadmap';
   // Technical / structure
-  if (/"type"\s*:\s*"object"|"properties"\s*:|"\$schema"/i.test(content)) return 'Esquema JSON';
-  if (/Action Item|Acuerdos|DECISIONES|Próximos Pasos/i.test(content)) return 'Actas de Reunión';
-  if (/\[\[.*?\]\]|#\w+.*?\|\|/i.test(content))                       return 'Grafo de Conocimiento';
+  if (/"type"\s*:\s*"object"|"properties"\s*:|"\$schema"/i.test(content)) return lang === 'es' ? 'Esquema JSON' : 'JSON Schema';
+  if (/Action Item|Acuerdos|DECISIONES|Próximos Pasos/i.test(content)) return lang === 'es' ? 'Actas de Reunión' : 'Meeting Minutes';
+  if (/\[\[.*?\]\]|#\w+.*?\|\|/i.test(content))                       return lang === 'es' ? 'Grafo de Conocimiento' : 'Knowledge Graph';
   // Prompts
-  if (/--ar\s+\d+:\d+|--style|--chaos|--seed/i.test(content))          return 'Prompt de Imagen';
-  if (/\[SYSTEM\]|<system>|<assistant>|\[INST\]/i.test(content))       return 'System Instruction';
+  if (/--ar\s+\d+:\d+|--style|--chaos|--seed/i.test(content))          return lang === 'es' ? 'Prompt de Imagen' : 'Image Prompt';
+  if (/\[SYSTEM\]|<system>|<assistant>|\[INST\]/i.test(content))       return lang === 'es' ? 'System Instruction' : 'System Instruction';
   return null;
 };
 
 // Main title resolver
-const generateDocTitle = (content: string, preset?: string, module?: string): string => {
+const generateDocTitle = (content: string, preset?: string, module?: string, lang: 'en' | 'es' = 'en'): string => {
   // L1: First heading in AI output
   const heading = content.match(/^#{1,2}\s+(.+)$/m);
   if (heading) {
@@ -119,15 +189,15 @@ const generateDocTitle = (content: string, preset?: string, module?: string): st
     if (cleaned.length > 3) return cleaned;
   }
   // L2: Content pattern detection
-  const detected = detectFromContent(content);
+  const detected = detectFromContent(content, lang);
   if (detected) return detected;
   // L3: Preset lookup
-  if (preset && PRESET_TITLES[preset] && PRESET_TITLES[preset] !== 'Documento') {
-    return PRESET_TITLES[preset];
+  if (preset && PRESET_TITLES[lang][preset] && PRESET_TITLES[lang][preset] !== 'Document' && PRESET_TITLES[lang][preset] !== 'Documento') {
+    return PRESET_TITLES[lang][preset];
   }
   // L4: Module default
-  if (module && MODULE_TITLES[module]) return MODULE_TITLES[module];
-  return 'Documento';
+  if (module && MODULE_TITLES[lang][module]) return MODULE_TITLES[lang][module];
+  return lang === 'es' ? 'Documento' : 'Document';
 };
 
 // ─── DOCUMENT THEME SYSTEM ───────────────────────────────────────────────────
@@ -229,6 +299,26 @@ const DEFAULT_THEME: DocTheme = {
 const getTheme = (module?: string): DocTheme =>
   module ? (MODULE_DOC_THEMES[module] ?? DEFAULT_THEME) : DEFAULT_THEME;
 
+const getLocalizedThemeLabel = (label: string, lang: 'en' | 'es' = 'en'): string => {
+  if (lang === 'en') {
+    if (label === 'Documento') return 'Document';
+    return label;
+  }
+  const mapping: Record<string, string> = {
+    'Content Generation': 'Generación de Contenido',
+    'Smart Calendar': 'Calendario Inteligente',
+    'SEO & Growth': 'SEO y Crecimiento',
+    'Voice to Structure': 'Voz a Estructura',
+    'Pro Refinement': 'Refinamiento Pro',
+    'Table Engine': 'Motor de Tablas',
+    'Universal Prompt': 'Prompt Universal',
+    'Brainstorming': 'Lluvia de Ideas',
+    'Document': 'Documento',
+    'Documento': 'Documento',
+  };
+  return mapping[label] || label;
+};
+
 // ─── MARKDOWN → HTML ─────────────────────────────────────────────────────────
 
 const markdownToHTML = (md: string): string => {
@@ -317,7 +407,7 @@ const markdownToHTML = (md: string): string => {
 // ─── DOCUMENT BUILDER ────────────────────────────────────────────────────────
 
 const getTimestamp = () => new Date().toISOString().slice(0, 10);
-const formatDate = () => new Date().toLocaleDateString('es-ES', {
+const formatDate = (lang: 'en' | 'es' = 'en') => new Date().toLocaleDateString(lang === 'es' ? 'es-ES' : 'en-US', {
   year: 'numeric', month: 'long', day: 'numeric'
 });
 
@@ -573,13 +663,14 @@ const buildWordCSS = (theme: DocTheme): string => `
   .doc-footer { padding: 16pt 48pt; border-top: 1pt solid #e5e7eb; display: flex; justify-content: space-between; font-size: 8pt; color: var(--mut); font-family: Consolas, monospace; }
 `;
 
-const buildDocumentHTML = (content: string, label: string, theme: DocTheme, forPrint = false): string => {
+const buildDocumentHTML = (content: string, label: string, theme: DocTheme, lang: 'en' | 'es' = 'en', forPrint = false): string => {
   const body = markdownToHTML(content);
   const printScript = forPrint
     ? `<script>window.addEventListener('load',()=>{setTimeout(()=>{window.print();window.onafterprint=()=>window.close();},800);});<\/script>`
     : '';
+  const localizedWorkflow = getLocalizedThemeLabel(theme.label, lang);
   return `<!DOCTYPE html>
-<html lang="es">
+<html lang="${lang}">
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
@@ -590,9 +681,9 @@ const buildDocumentHTML = (content: string, label: string, theme: DocTheme, forP
 <body>
 <div class="page">
   <div class="doc-header">
-    <div class="doc-workflow">Ideation Engine · ${theme.label}</div>
+    <div class="doc-workflow">Ideation Engine · ${localizedWorkflow}</div>
     <div class="doc-title">${label}</div>
-    <div class="doc-dateline">${formatDate()}</div>
+    <div class="doc-dateline">${formatDate(lang)}</div>
   </div>
   <div class="doc-body">${body}</div>
   <div class="doc-footer">
@@ -600,19 +691,20 @@ const buildDocumentHTML = (content: string, label: string, theme: DocTheme, forP
       <span class="doc-footer-dot"></span>
       Ideation Engine
     </div>
-    <span>${new Date().toLocaleString('es-ES')}</span>
+    <span>${new Date().toLocaleString(lang === 'es' ? 'es-ES' : 'en-US')}</span>
   </div>
 </div>
 </body>
 </html>`;
 };
 
-const buildWordHTML = (content: string, label: string, theme: DocTheme): string => {
+const buildWordHTML = (content: string, label: string, theme: DocTheme, lang: 'en' | 'es' = 'en'): string => {
   const body = markdownToHTML(content);
+  const localizedWorkflow = getLocalizedThemeLabel(theme.label, lang);
   return `<!DOCTYPE html>
 <html xmlns:o="urn:schemas-microsoft-com:office:office"
       xmlns:w="urn:schemas-microsoft-com:office:word"
-      xmlns="http://www.w3.org/TR/REC-html40" lang="es">
+      xmlns="http://www.w3.org/TR/REC-html40" lang="${lang}">
 <head>
   <meta charset="utf-8"/>
   <title>${label}</title>
@@ -622,14 +714,14 @@ const buildWordHTML = (content: string, label: string, theme: DocTheme): string 
 <body>
 <div class="page">
   <div class="doc-header">
-    <div class="doc-workflow">Ideation Engine · ${theme.label}</div>
+    <div class="doc-workflow">Ideation Engine · ${localizedWorkflow}</div>
     <div class="doc-title">${label}</div>
-    <div class="doc-dateline">${formatDate()}</div>
+    <div class="doc-dateline">${formatDate(lang)}</div>
   </div>
   <div class="doc-body">${body}</div>
   <div class="doc-footer">
     <span>Ideation Engine</span>
-    <span>${new Date().toLocaleString('es-ES')}</span>
+    <span>${new Date().toLocaleString(lang === 'es' ? 'es-ES' : 'en-US')}</span>
   </div>
 </div>
 </body>
@@ -652,7 +744,7 @@ const exportMarkdown = (text: string, label: string, theme: DocTheme) => {
   downloadBlob(new Blob([header + text], { type: 'text/markdown;charset=utf-8' }), `${label}-${getTimestamp()}.md`);
 };
 
-const exportPDF = (text: string, label: string, theme: DocTheme) => {
+const exportPDF = (text: string, label: string, theme: DocTheme, lang: 'en' | 'es' = 'en') => {
   const iframe = document.createElement('iframe');
   iframe.style.position = 'fixed';
   iframe.style.right = '0';
@@ -668,7 +760,7 @@ const exportPDF = (text: string, label: string, theme: DocTheme) => {
 
   const doc = iframe.contentWindow?.document || iframe.contentDocument;
   if (!doc) {
-    alert('Error al generar el PDF.');
+    alert(lang === 'es' ? 'Error al generar el PDF.' : 'Error generating PDF.');
     document.body.removeChild(iframe);
     return;
   }
@@ -680,7 +772,7 @@ const exportPDF = (text: string, label: string, theme: DocTheme) => {
         iframe.contentWindow?.print();
       } catch (e) {
         console.error('Failed to print iframe:', e);
-        alert('Hubo un problema al abrir el diálogo de impresión. Intenta copiar el texto directamente.');
+        alert(lang === 'es' ? 'Hubo un problema al abrir el diálogo de impresión. Intenta copiar el texto directamente.' : 'There was a problem opening the print dialog. Try copying the text directly.');
       }
       
       // Remove the iframe after a delay to ensure print dialog completed
@@ -693,13 +785,12 @@ const exportPDF = (text: string, label: string, theme: DocTheme) => {
   };
 
   doc.open();
-  doc.write(buildDocumentHTML(text, label, theme, false));
+  doc.write(buildDocumentHTML(text, label, theme, lang, false));
   doc.close();
 };
 
-
-const exportDOC = (text: string, label: string, theme: DocTheme) => {
-  const html = buildWordHTML(text, label, theme);
+const exportDOC = (text: string, label: string, theme: DocTheme, lang: 'en' | 'es' = 'en') => {
+  const html = buildWordHTML(text, label, theme, lang);
   downloadBlob(
     new Blob(['\ufeff', html], { type: 'application/vnd.ms-word;charset=utf-8' }),
     `${label}-${getTimestamp()}.doc`
@@ -728,9 +819,9 @@ const hasTableData = (text: string): boolean =>
 
 // ─── EXPORT DROPDOWN ─────────────────────────────────────────────────────────
 
-interface ExportMenuProps { text: string; label: string; isCSV?: boolean; theme: DocTheme; }
+interface ExportMenuProps { text: string; label: string; isCSV?: boolean; theme: DocTheme; lang: 'en' | 'es'; }
 
-const ExportMenu: React.FC<ExportMenuProps> = ({ text, label, isCSV, theme }) => {
+const ExportMenu: React.FC<ExportMenuProps> = ({ text, label, isCSV, theme, lang }) => {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const safeLabel = label.toLowerCase().replace(/[^a-z0-9]/g, '-');
@@ -738,9 +829,9 @@ const ExportMenu: React.FC<ExportMenuProps> = ({ text, label, isCSV, theme }) =>
 
   const options = [
     ...(showCSV ? [{ id: 'csv', ext: 'CSV', name: 'Excel / Google Sheets', color: 'text-emerald-400', hover: 'hover:bg-emerald-900/20', fn: () => exportCSV(text, safeLabel) }] : []),
-    { id: 'pdf', ext: 'PDF', name: 'Documento PDF', color: 'text-red-400', hover: 'hover:bg-red-900/20', fn: () => exportPDF(text, label, theme) },
-    { id: 'doc', ext: 'DOC', name: 'Word (.doc)', color: 'text-blue-400', hover: 'hover:bg-blue-900/20', fn: () => exportDOC(text, label, theme) },
-    { id: 'md', ext: 'MD', name: 'Markdown (.md)', color: 'text-violet-400', hover: 'hover:bg-violet-900/20', fn: () => exportMarkdown(text, safeLabel, theme) },
+    { id: 'pdf', ext: 'PDF', name: lang === 'es' ? 'Documento PDF' : 'PDF Document', color: 'text-red-400', hover: 'hover:bg-red-900/20', fn: () => exportPDF(text, label, theme, lang) },
+    { id: 'doc', ext: 'DOC', name: lang === 'es' ? 'Word (.doc)' : 'Word Document (.doc)', color: 'text-blue-400', hover: 'hover:bg-blue-900/20', fn: () => exportDOC(text, label, theme, lang) },
+    { id: 'md', ext: 'MD', name: lang === 'es' ? 'Markdown (.md)' : 'Markdown File (.md)', color: 'text-violet-400', hover: 'hover:bg-violet-900/20', fn: () => exportMarkdown(text, safeLabel, theme) },
   ];
 
   return (
@@ -752,7 +843,7 @@ const ExportMenu: React.FC<ExportMenuProps> = ({ text, label, isCSV, theme }) =>
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3.5 h-3.5">
           <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/>
         </svg>
-        EXPORT
+        {lang === 'es' ? 'EXPORTAR' : 'EXPORT'}
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-2.5 h-2.5 opacity-50">
           <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clipRule="evenodd"/>
         </svg>
@@ -764,7 +855,7 @@ const ExportMenu: React.FC<ExportMenuProps> = ({ text, label, isCSV, theme }) =>
           <div className="absolute right-0 top-full mt-2 z-50 w-52 bg-[#0e0e0e] border border-white/10 rounded-2xl shadow-2xl overflow-hidden">
             <div className="px-4 py-2.5 border-b border-white/5 flex items-center gap-2">
               <div className="w-1.5 h-1.5 rounded-full" style={{ background: theme.primary }}></div>
-              <span className="text-[9px] font-mono text-gray-400 uppercase tracking-widest">Exportar · {theme.label}</span>
+              <span className="text-[9px] font-mono text-gray-400 uppercase tracking-widest">{lang === 'es' ? 'Exportar' : 'Export'} · {getLocalizedThemeLabel(theme.label, lang)}</span>
             </div>
             {options.map(opt => (
               <button key={opt.id} onClick={() => { opt.fn(); setOpen(false); }}
@@ -786,9 +877,10 @@ interface CopyableBlockProps {
   label: string; code: string;
   isProse?: boolean; isTableContent?: boolean;
   theme: DocTheme;
+  lang: 'en' | 'es';
 }
 
-const CopyableBlock: React.FC<CopyableBlockProps> = ({ label, code, isProse = false, isTableContent, theme }) => {
+const CopyableBlock: React.FC<CopyableBlockProps> = ({ label, code, isProse = false, isTableContent, theme, lang }) => {
   const [copied, setCopied] = useState(false);
   const isCSV = label === 'CSV' || isTableContent;
 
@@ -806,19 +898,19 @@ const CopyableBlock: React.FC<CopyableBlockProps> = ({ label, code, isProse = fa
           <span className="text-[10px] font-mono font-bold text-thinklab-text uppercase tracking-widest opacity-80">{label}</span>
         </div>
         <div className="flex items-center gap-2">
-          <ExportMenu text={code.trim()} label={label} isCSV={isCSV} theme={theme} />
+          <ExportMenu text={code.trim()} label={label} isCSV={isCSV} theme={theme} lang={lang} />
           <button onClick={handleCopy} className={`flex items-center gap-1.5 text-[10px] font-mono transition-all px-3 py-1 rounded-full border ${
             copied ? 'bg-green-900/20 border-green-900 text-green-500'
                    : 'bg-black/20 border-white/5 text-thinklab-text hover:bg-white/10 hover:text-white hover:border-white/20'
           }`}>
             {copied ? (
-              <><span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block"></span>COPIADO</>
+              <><span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block"></span>{lang === 'es' ? 'COPIADO' : 'COPIED'}</>
             ) : (
               <>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3.5 h-3.5">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5"/>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5"/>
                 </svg>
-                COPIAR
+                {lang === 'es' ? 'COPIAR' : 'COPY'}
               </>
             )}
           </button>
@@ -841,16 +933,16 @@ const CopyableBlock: React.FC<CopyableBlockProps> = ({ label, code, isProse = fa
 
 // ─── MAIN RENDERER ────────────────────────────────────────────────────────────
 
-const OutputRenderer: React.FC<OutputRendererProps> = ({ content, isTableContent, module, preset }) => {
+const OutputRenderer: React.FC<OutputRendererProps> = ({ content, isTableContent, module, preset, uiLanguage = 'en' }) => {
   const theme = getTheme(module);
-  const docTitle = generateDocTitle(content, preset, module);
+  const docTitle = generateDocTitle(content, preset, module, uiLanguage);
   const parts = content.split(/```(\w*)\n?([\s\S]*?)```/g);
 
   const renderParts = () => {
     const elements: React.ReactNode[] = [];
 
     if (parts.length === 1) {
-      return <CopyableBlock key="full-text" label={docTitle} code={content} isTableContent={isTableContent} theme={theme} />;
+      return <CopyableBlock key="full-text" label={docTitle} code={content} isTableContent={isTableContent} theme={theme} lang={uiLanguage} />;
     }
 
     for (let i = 0; i < parts.length; i++) {
@@ -862,16 +954,17 @@ const OutputRenderer: React.FC<OutputRendererProps> = ({ content, isTableContent
           elements.push(
             <CopyableBlock
               key={`text-${i}`}
-              label={isFirst ? docTitle : 'CONTEXTO'}
+              label={isFirst ? docTitle : (uiLanguage === 'es' ? 'CONTEXTO' : 'CONTEXT')}
               code={textContent.trim()}
               isProse={true}
               isTableContent={isTableContent}
               theme={theme}
+              lang={uiLanguage}
             />
           );
         }
       } else {
-        const lang = parts[i] || 'MARKDOWN';
+        const codeLang = parts[i] || 'MARKDOWN';
         const code = parts[i + 1];
         if (code && code.trim()) {
           // Code/structured blocks keep their language label (JSON, CSV, etc.)
@@ -879,10 +972,11 @@ const OutputRenderer: React.FC<OutputRendererProps> = ({ content, isTableContent
           elements.push(
             <CopyableBlock
               key={`code-${i}`}
-              label={isFirstBlock ? docTitle : lang.toUpperCase() || 'BLOQUE'}
+              label={isFirstBlock ? docTitle : (codeLang.toUpperCase() || (uiLanguage === 'es' ? 'BLOQUE' : 'BLOCK'))}
               code={code}
-              isTableContent={isTableContent || lang.toLowerCase() === 'csv'}
+              isTableContent={isTableContent || codeLang.toLowerCase() === 'csv'}
               theme={theme}
+              lang={uiLanguage}
             />
           );
         }

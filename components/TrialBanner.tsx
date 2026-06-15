@@ -4,9 +4,10 @@ interface TrialBannerProps {
   sessionCount: number;
   maxSessions: number;
   onDeleteSession?: () => void;
+  uiLanguage?: 'en' | 'es';
 }
 
-const TrialBanner: React.FC<TrialBannerProps> = ({ sessionCount, maxSessions, onDeleteSession }) => {
+const TrialBanner: React.FC<TrialBannerProps> = ({ sessionCount, maxSessions, onDeleteSession, uiLanguage = 'en' }) => {
   const remaining = maxSessions - sessionCount;
   const isBlocked = remaining <= 0;
   const isWarning = remaining <= 2 && remaining > 0;
@@ -22,17 +23,20 @@ const TrialBanner: React.FC<TrialBannerProps> = ({ sessionCount, maxSessions, on
           </svg>
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-[12px] font-semibold text-red-400 mb-0.5">Límite de prueba alcanzado</p>
+          <p className="text-[12px] font-semibold text-red-400 mb-0.5">
+            {uiLanguage === 'es' ? 'Límite de prueba alcanzado' : 'Trial limit reached'}
+          </p>
           <p className="text-[11px] text-red-300/70 leading-snug">
-            Has usado los {maxSessions} chats incluidos en tu prueba gratuita.
-            Elimina una sesión para continuar.
+            {uiLanguage === 'es'
+              ? `Has usado los ${maxSessions} chats incluidos en tu prueba gratuita. Elimina una sesión para continuar.`
+              : `You've used all ${maxSessions} chats included in your free trial. Delete a session to continue.`}
           </p>
           {onDeleteSession && (
             <button
               onClick={onDeleteSession}
               className="mt-2 text-[11px] font-mono text-red-400 hover:text-red-300 underline underline-offset-2 transition-colors"
             >
-              Gestionar sesiones →
+              {uiLanguage === 'es' ? 'Gestionar sesiones →' : 'Manage sessions →'}
             </button>
           )}
         </div>
@@ -44,8 +48,17 @@ const TrialBanner: React.FC<TrialBannerProps> = ({ sessionCount, maxSessions, on
     <div className="mx-4 mb-3 rounded-xl border border-amber-500/15 bg-amber-950/20 p-3 flex items-center gap-3">
       <div className="w-2 h-2 rounded-full bg-amber-400 animate-pulse shrink-0"></div>
       <p className="text-[11px] text-amber-300/80 leading-snug">
-        <span className="font-semibold">Te {remaining === 1 ? 'queda 1 chat' : `quedan ${remaining} chats`}</span>
-        {' '}en tu prueba gratuita de {maxSessions}.
+        {uiLanguage === 'es' ? (
+          <>
+            <span className="font-semibold">{remaining === 1 ? 'Te queda 1 chat' : `Te quedan ${remaining} chats`}</span>
+            {` en tu prueba gratuita de ${maxSessions}.`}
+          </>
+        ) : (
+          <>
+            <span className="font-semibold">{remaining === 1 ? '1 chat remaining' : `${remaining} chats remaining`}</span>
+            {` in your free trial of ${maxSessions}.`}
+          </>
+        )}
       </p>
     </div>
   );

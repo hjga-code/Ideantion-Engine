@@ -40,7 +40,7 @@ export const generateSessionTitleOpenRouter = async (
     userText: string,
     aiText: string
 ): Promise<string> => {
-    if (!apiKey) return "Sesión";
+    if (!apiKey) return "Session";
     try {
         const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
           method: "POST",
@@ -54,15 +54,15 @@ export const generateSessionTitleOpenRouter = async (
             model: "google/gemini-2.0-flash-lite-preview-02-05:free", // Use a cheap/free model for titles
             messages: [{
                 role: "user",
-                content: `Genera un título extremadamente conciso (máximo 5 palabras) que resuma el tema de esta interacción. OUTPUT SOLO EL TÍTULO. SIN comillas. SIN prefijos.\n\nUsuario: ${userText.slice(0, 500) || "[Multimodal]"}\nIA: ${aiText.slice(0, 500)}...`
+                content: `Generate an extremely concise title (max 5 words) summarizing the topic of this interaction. OUTPUT ONLY THE TITLE. NO quotes. NO prefixes. Match the language of the user's input.\n\nUser: ${userText.slice(0, 500) || "[Multimodal]"}\nAI: ${aiText.slice(0, 500)}...`
             }],
             temperature: 0.5,
           })
         });
         const data = await response.json();
-        return data.choices?.[0]?.message?.content?.trim() || "Sesión";
+        return data.choices?.[0]?.message?.content?.trim() || "Session";
     } catch (e) {
-        return "Sesión";
+        return "Session";
     }
 };
 
@@ -79,7 +79,7 @@ export const processContentOpenRouter = async (
   format: OutputFormat
 ): Promise<string> => {
   try {
-    if (!apiKey) throw new Error("Falta la API Key de OpenRouter.");
+    if (!apiKey) throw new Error("Missing OpenRouter API Key.");
 
     // 1. LOAD SKILL
     const activeSkill = getSkillForModule(module);
@@ -87,10 +87,10 @@ export const processContentOpenRouter = async (
     [[ACTIVE SKILL: ${activeSkill.name} v${activeSkill.version}]]
     ${activeSkill.content}
     
-    [[OUTPUT CONFIG]]
-    LANGUAGE: ${language !== 'AUTO' ? LANGUAGES[language] : 'Original'}
-    FORMAT: ${format}
-    CONTEXT: ${preset}
+    [[RUNTIME PARAMETERS — CRITICAL OVERRIDES]]
+    - ⚠️ OUTPUT LANGUAGE: ${language !== 'AUTO' ? `FORCE OUTPUT IN ${LANGUAGES[language]} — regardless of the user input language` : "AUTO-DETECT: You MUST detect the language the user wrote in and output EVERYTHING — all labels, headers, content, tables, and text — in that EXACT SAME language. English input → English output. Spanish input → Spanish output. This is a HARD CONSTRAINT."}
+    - OUTPUT FORMAT: ${format}
+    - ACTIVE PRESET: ${preset}
     `;
 
     const systemContent = `${THINKLAB_ORCHESTRATOR_PROMPT}\n\n${skillContext}`;
@@ -121,7 +121,7 @@ export const processContentOpenRouter = async (
     if (text.trim()) {
         userContent.push({ type: "text", text: text });
     } else if (audioBlob || images.length > 0) {
-        userContent.push({ type: "text", text: "Procesa el input adjunto usando la Skill activa." });
+        userContent.push({ type: "text", text: "Process the attached input using the active Skill." });
     }
 
     if (audioBlob) {
@@ -168,7 +168,7 @@ export const processContentOpenRouter = async (
     }
 
     const data = await response.json();
-    return data.choices[0]?.message?.content || "Sin respuesta.";
+    return data.choices[0]?.message?.content || "No response.";
 
   } catch (error) {
     console.error("OpenRouter Error:", error);

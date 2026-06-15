@@ -10,9 +10,10 @@ import { processContent, validateGeminiConnection, generateSessionTitle } from '
 import { processContentOpenRouter, validateOpenRouterConnection, generateSessionTitleOpenRouter } from './services/openRouterService';
 import { signOut } from './services/authService';
 import type { AppUser } from './services/authService';
+import { TRANSLATIONS, type UILanguage } from './services/translations';
 import { getSessions, upsertSession, deleteSession, getUserSettings, saveUserSettings, getSessionCount, MAX_SESSIONS } from './supabaseDb';
 import { Session, ChatMessage, ModuleType, ProcessingState, UserInput, AudioState, PresetType, TargetLanguage, OutputFormat, AIProvider } from './types';
-import { MODULE_ICONS, MODULE_DESCRIPTIONS, PRESETS, LANGUAGES, FORMATS, GEMINI_MODELS, OPENROUTER_MODELS, MODULE_SPECIFIC_CONFIG } from './constants';
+import { MODULE_ICONS, MODULE_DESCRIPTIONS, PRESETS, LANGUAGES, FORMATS, GEMINI_MODELS, OPENROUTER_MODELS, MODULE_SPECIFIC_CONFIG, LOCALIZED_PRESETS, LOCALIZED_LANGUAGES, LOCALIZED_FORMATS } from './constants';
 import { ThinkLabLogo } from './components/ThinkLabLogo';
 
 
@@ -166,6 +167,22 @@ interface AppProps {
 const App: React.FC<AppProps> = ({ user }) => {
   // --- STATE MANAGEMENT ---
 
+  // UI Language State (Persisted)
+  const [uiLanguage, setUiLanguage] = useState<UILanguage>(() => {
+    const saved = localStorage.getItem('thinklab_ui_lang');
+    return (saved === 'es' || saved === 'en') ? saved : 'en';
+  });
+
+  const changeUiLanguage = (lang: UILanguage) => {
+    setUiLanguage(lang);
+    localStorage.setItem('thinklab_ui_lang', lang);
+  };
+
+  const t = useCallback((key: string) => {
+    const k = key as keyof typeof TRANSLATIONS['en'];
+    return TRANSLATIONS[uiLanguage][k] || TRANSLATIONS['en'][k] || key;
+  }, [uiLanguage]);
+
   // Supabase-backed sessions (replaces Dexie useLiveQuery)
   const [sessions, setSessions] = useState<Session[]>([]);
   const [sessionCount, setSessionCount] = useState(0);
@@ -188,7 +205,7 @@ const App: React.FC<AppProps> = ({ user }) => {
 
   const [showProviderSettings, setShowProviderSettings] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<'IDLE' | 'TESTING' | 'SUCCESS' | 'ERROR'>('IDLE');
-  const [providerName, setProviderName] = useState("Mi Espacio de Trabajo");
+  const [providerName, setProviderName] = useState("My Workspace");
 
   const [processingState, setProcessingState] = useState<ProcessingState>({
     isRecording: false,
@@ -307,7 +324,7 @@ const App: React.FC<AppProps> = ({ user }) => {
                           reader.onload = (event) => {
                               if (event.target?.result) {
                                   setInput(prev => ({...prev, images: [...prev.images, event.target!.result as string]}));
-                                  setToast({ message: "Imagen pegada del portapapeles", type: "success"});
+                                  setToast({ message: uiLanguage === 'es' ? "Imagen pegada del portapapeles" : "Image pasted from clipboard", type: "success"});
                                   if (!isSettingsPanelOpen) setIsSettingsPanelOpen(true); 
                               }
                           };
@@ -319,7 +336,7 @@ const App: React.FC<AppProps> = ({ user }) => {
       };
       window.addEventListener('paste', handlePaste);
       return () => window.removeEventListener('paste', handlePaste);
-  }, [isSettingsPanelOpen]);
+  }, [isSettingsPanelOpen, uiLanguage]);
 
   // --- HANDLERS ---
   
@@ -328,11 +345,14 @@ const App: React.FC<AppProps> = ({ user }) => {
       
       // Enforce Strict Configuration for the selected module
       const config = MODULE_SPECIFIC_CONFIG[module];
-      const validPreset = config.validPresets[0];
+      const validPreset = config.validPresets.includes('GENERAL') ? 'GENERAL' : config.validPresets[0];
       const validFormat = config.validFormats[0];
 
       // Merge defaults with strict validation
-      const updates: Partial<UserInput> = { ...defaults };
+      const updates: Partial<UserInput> = { 
+          preset: 'GENERAL',
+          ...defaults 
+      };
       
       // Ensure preset is valid for this module
       if (!config.validPresets.includes(updates.preset || input.preset)) {
@@ -348,7 +368,7 @@ const App: React.FC<AppProps> = ({ user }) => {
       // Trigger Minimalist Notification
       setSkillNotification({ 
           module, 
-          details: `${PRESETS[updates.preset || input.preset]} • ${FORMATS[updates.format || input.format]}` 
+          details: `${LOCALIZED_PRESETS[uiLanguage][updates.preset || input.preset]} • ${LOCALIZED_FORMATS[uiLanguage][updates.format || input.format]}` 
       });
       
       // Only close if requested (default behavior for Cards, but NOT for Panel buttons)
@@ -367,11 +387,11 @@ const App: React.FC<AppProps> = ({ user }) => {
       }
       if (isValid) {
           setConnectionStatus('SUCCESS');
-          setToast({ message: "Conexión exitosa", type: 'success' });
+          setToast({ message: t('success_alert'), type: 'success' });
           setTimeout(() => setConnectionStatus('IDLE'), 3000);
       } else {
           setConnectionStatus('ERROR');
-          setToast({ message: "Error al conectar. Verifica tu API Key.", type: 'error' });
+          setToast({ message: t('error_alert'), type: 'error' });
       }
   };
 
@@ -432,8 +452,8 @@ const App: React.FC<AppProps> = ({ user }) => {
       fmt: OutputFormat
   ): Promise<string | null> => {
       if (!audioBlob && !text.trim() && images.length === 0) {
-          setProcessingState(prev => ({ ...prev, error: "Ingresa texto, audio o imágenes." }));
-          setToast({ message: "Input vacío", type: "error" });
+          setProcessingState(prev => ({ ...prev, error: uiLanguage === 'es' ? "Ingresa texto, audio o imágenes." : "Enter text, audio or images." }));
+          setToast({ message: uiLanguage === 'es' ? "Input vacío" : "Empty input", type: "error" });
           return null;
       }
 
@@ -477,10 +497,10 @@ const App: React.FC<AppProps> = ({ user }) => {
         let sessionId = currentSessionId;
         let isNewSession = false;
 
-        let defaultTitle = "Nueva Sesión";
+        let defaultTitle = uiLanguage === 'es' ? "Nueva Sesión" : "New Session";
         if (text && text.trim().length > 0) defaultTitle = text.slice(0, 30) + (text.length > 30 ? '...' : '');
-        else if (images.length > 0) defaultTitle = "Análisis Visual";
-        else if (audioBlob) defaultTitle = "Nota de Voz";
+        else if (images.length > 0) defaultTitle = uiLanguage === 'es' ? "Análisis Visual" : "Visual Analysis";
+        else if (audioBlob) defaultTitle = uiLanguage === 'es' ? "Nota de Voz" : "Voice Note";
 
         let sessionTitle = currentSessionId
             ? (sessions.find(s => s.id === currentSessionId)?.title ?? defaultTitle)
@@ -495,7 +515,7 @@ const App: React.FC<AppProps> = ({ user }) => {
 
         const updatedSession: Session = {
             id: sessionId!,
-            title: sessionTitle || "Sesión",
+            title: sessionTitle || (uiLanguage === 'es' ? "Sesión" : "Session"),
             timestamp: sessions.find(s => s.id === sessionId)?.timestamp || Date.now(),
             lastModified: Date.now(),
             messages: finalMessages,
@@ -509,7 +529,7 @@ const App: React.FC<AppProps> = ({ user }) => {
 
         // Enforce 10-chat trial limit for new sessions
         if (isNewSession && sessionCount >= MAX_SESSIONS) {
-          setToast({ message: `Límite de ${MAX_SESSIONS} chats alcanzado. Elimina una sesión para continuar.`, type: 'error' });
+          setToast({ message: uiLanguage === 'es' ? `Límite de ${MAX_SESSIONS} chats alcanzado. Elimina una sesión para continuar.` : `${MAX_SESSIONS}-chat limit reached. Delete a session to continue.`, type: 'error' });
           setProcessingState(prev => ({ ...prev, isProcessing: false }));
           return null;
         }
@@ -527,7 +547,7 @@ const App: React.FC<AppProps> = ({ user }) => {
                     newTitle = await generateSessionTitleOpenRouter(input.openRouterKey, input.openRouterModel, text, result);
                 }
                 
-                if (newTitle && newTitle !== 'Sesión') {
+                if (newTitle && newTitle !== 'Sesión' && newTitle !== 'Session') {
                      newTitle = newTitle.replace(/^["']|["']$/g, '');
                      await upsertSession(user.id, { ...updatedSession, title: newTitle });
                      await refreshSessions();
@@ -539,8 +559,8 @@ const App: React.FC<AppProps> = ({ user }) => {
         return result;
 
       } catch (err: any) {
-        setProcessingState(prev => ({ ...prev, error: err.message || "Error al procesar." }));
-        setToast({ message: "Error: " + err.message, type: "error" });
+        setProcessingState(prev => ({ ...prev, error: err.message || (uiLanguage === 'es' ? "Error al procesar." : "Processing error.") }));
+        setToast({ message: (uiLanguage === 'es' ? "Error: " : "Error: ") + err.message, type: "error" });
         return null;
       } finally {
         setProcessingState(prev => ({ ...prev, isProcessing: false }));
@@ -548,7 +568,9 @@ const App: React.FC<AppProps> = ({ user }) => {
   };
 
   // --- WIDGET & PIP HANDLERS ---
-  const handleWidgetModuleChange = (module: ModuleType) => { setActiveModule(module); };
+  const handleWidgetModuleChange = (module: ModuleType) => {
+    handleModuleSelect(module, {}, false);
+  };
   const handleWidgetStateChange = (updates: Partial<UserInput>) => { setInput(prev => ({ ...prev, ...updates })); };
   const handleWidgetProcess = async (audio: AudioState) => {
       const result = await handleProcessing('', audio.blob, [], activeModule, input.preset, input.language, input.format);
@@ -557,7 +579,7 @@ const App: React.FC<AppProps> = ({ user }) => {
           const copied = await copyToClipboardRobust(result, window);
           if (copied) {
               setIsWidgetSuccess(true);
-              setToast({ message: "COPIADO", type: "success" });
+              setToast({ message: uiLanguage === 'es' ? "COPIADO" : "COPIED", type: "success" });
               setTimeout(() => { setIsWidgetSuccess(false); }, 2000);
           } else { setWidgetManualCopyContent(result); }
       }
@@ -568,9 +590,9 @@ const App: React.FC<AppProps> = ({ user }) => {
       if (copied) {
           setIsWidgetSuccess(true);
           setWidgetManualCopyContent(null);
-          setToast({ message: "COPIADO", type: "success" });
+          setToast({ message: uiLanguage === 'es' ? "COPIADO" : "COPIED", type: "success" });
           setTimeout(() => setIsWidgetSuccess(false), 2000);
-      } else { setToast({ message: "ERROR DE COPIADO", type: "error" }); }
+      } else { setToast({ message: uiLanguage === 'es' ? "ERROR DE COPIADO" : "COPY ERROR", type: "error" }); }
   };
   const handleTogglePiP = async () => {
       if (window.self !== window.top) return;
@@ -593,7 +615,7 @@ const App: React.FC<AppProps> = ({ user }) => {
         text: '', 
         audio: { blob: null, url: null }, 
         images: [],
-        preset: session.preset,
+        preset: 'GENERAL',
         language: session.language,
         format: session.format,
         provider: session.provider || 'GEMINI'
@@ -607,7 +629,7 @@ const App: React.FC<AppProps> = ({ user }) => {
       setMessages([]);
       setCurrentSessionId(null);
       handleClearAudio();
-      setInput(prev => ({ ...prev, text: '', images: [] }));
+      setInput(prev => ({ ...prev, text: '', images: [], preset: 'GENERAL' }));
       setProcessingState({ isProcessing: false, isRecording: false, error: null });
   };
 
@@ -621,14 +643,14 @@ const App: React.FC<AppProps> = ({ user }) => {
       <input type="file" ref={imageInputRef} onChange={handleImageChange} accept="image/*" className="hidden" />
 
       {isWidgetMode && !pipWindow && (
-          <WidgetMode onExit={() => setIsWidgetMode(false)} onProcess={handleWidgetProcess} isProcessing={processingState.isProcessing} isSuccess={isWidgetSuccess} manualCopyContent={widgetManualCopyContent} onManualCopy={handleManualCopy} onTogglePiP={handleTogglePiP} isPip={false} activeModule={activeModule} userInput={input} onModuleChange={handleWidgetModuleChange} onStateChange={handleWidgetStateChange} />
+          <WidgetMode onExit={() => setIsWidgetMode(false)} onProcess={handleWidgetProcess} isProcessing={processingState.isProcessing} isSuccess={isWidgetSuccess} manualCopyContent={widgetManualCopyContent} onManualCopy={handleManualCopy} onTogglePiP={handleTogglePiP} isPip={false} activeModule={activeModule} userInput={input} onModuleChange={handleWidgetModuleChange} onStateChange={handleWidgetStateChange} uiLanguage={uiLanguage} />
       )}
       {pipWindow && createPortal(
-          <WidgetMode onExit={() => { pipWindow.close(); setIsWidgetMode(false); }} onProcess={handleWidgetProcess} isProcessing={processingState.isProcessing} isSuccess={isWidgetSuccess} manualCopyContent={widgetManualCopyContent} onManualCopy={handleManualCopy} onTogglePiP={handleTogglePiP} isPip={true} activeModule={activeModule} userInput={input} onModuleChange={handleWidgetModuleChange} onStateChange={handleWidgetStateChange} />,
+          <WidgetMode onExit={() => { pipWindow.close(); setIsWidgetMode(false); }} onProcess={handleWidgetProcess} isProcessing={processingState.isProcessing} isSuccess={isWidgetSuccess} manualCopyContent={widgetManualCopyContent} onManualCopy={handleManualCopy} onTogglePiP={handleTogglePiP} isPip={true} activeModule={activeModule} userInput={input} onModuleChange={handleWidgetModuleChange} onStateChange={handleWidgetStateChange} uiLanguage={uiLanguage} />,
           pipWindow.document.body
       )}
 
-      <HistorySidebar sessions={sessions} activeSessionId={currentSessionId} onSelect={loadSession} onNew={resetSession} onDelete={handleDeleteSession} onRename={handleRenameSession} isOpen={isSidebarOpen} toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
+      <HistorySidebar sessions={sessions} activeSessionId={currentSessionId} onSelect={loadSession} onNew={resetSession} onDelete={handleDeleteSession} onRename={handleRenameSession} isOpen={isSidebarOpen} toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} t={t} />
 
       <main className="flex-1 flex flex-col relative w-full h-full min-h-0 bg-thinklab-bg">
         <header className="flex-shrink-0 flex items-center justify-between p-4 border-b border-thinklab-border bg-thinklab-bg z-10">
@@ -636,7 +658,7 @@ const App: React.FC<AppProps> = ({ user }) => {
              <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-2 text-thinklab-text hover:text-white transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" /></svg>
              </button>
-             <span className="text-[11px] font-mono font-bold tracking-[0.2em] text-white uppercase select-none">IDEATION ENGINE</span>
+             <span className="text-[11px] font-mono font-bold tracking-[0.2em] text-white uppercase select-none">{t('ideation_engine')}</span>
           </div>
 
           {/* Right side: desktop shows full menu, mobile shows avatar+logout only */}
@@ -646,15 +668,22 @@ const App: React.FC<AppProps> = ({ user }) => {
             <div className="hidden md:flex items-center gap-3">
               <div className="flex items-center gap-1.5 px-3 py-1 bg-thinklab-surface border border-thinklab-border rounded-full">
                 <div className={`w-1.5 h-1.5 rounded-full ${sessionCount >= MAX_SESSIONS ? 'bg-red-400' : sessionCount >= MAX_SESSIONS - 2 ? 'bg-amber-400' : 'bg-thinklab-cyan shadow-[0_0_8px_#00d4ff]'}`}></div>
-                <span className="text-[10px] font-mono text-thinklab-text">{sessionCount}/{MAX_SESSIONS} chats</span>
+                <span className="text-[10px] font-mono text-thinklab-text">{sessionCount}/{MAX_SESSIONS} {t('chats')}</span>
               </div>
               <button onClick={() => setIsWidgetMode(true)} className="flex items-center gap-2 px-3 py-1.5 text-xs font-mono border border-thinklab-border rounded hover:bg-thinklab-surface transition-all text-thinklab-text">
-                 WIDGET
+                 {t('widget')}
               </button>
             </div>
 
-            {/* Always visible: avatar + logout */}
+            {/* Always visible: language switcher + avatar + logout */}
             <div className="flex items-center gap-2">
+              <button 
+                onClick={() => changeUiLanguage(uiLanguage === 'en' ? 'es' : 'en')}
+                title={uiLanguage === 'en' ? 'Cambiar a Español' : 'Switch to English'}
+                className="px-2 py-1 text-[10px] font-mono border border-thinklab-border rounded hover:bg-thinklab-surface transition-all text-thinklab-text flex items-center gap-1.5"
+              >
+                🌐 {uiLanguage === 'en' ? 'ES' : 'EN'}
+              </button>
               {user.avatarUrl ? (
                 <img src={user.avatarUrl} alt={user.name} className="w-7 h-7 rounded-full border border-white/10" />
               ) : (
@@ -665,7 +694,7 @@ const App: React.FC<AppProps> = ({ user }) => {
               <span className="text-[10px] font-mono text-thinklab-text max-w-[120px] truncate hidden lg:block">{user.name}</span>
               <button
                 onClick={signOut}
-                title="Cerrar sesión"
+                title={t('logout_title')}
                 className="p-1.5 text-thinklab-text hover:text-red-400 transition-colors"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
@@ -683,6 +712,7 @@ const App: React.FC<AppProps> = ({ user }) => {
           sessionCount={sessionCount}
           maxSessions={MAX_SESSIONS}
           onDeleteSession={() => setIsSidebarOpen(true)}
+          uiLanguage={uiLanguage}
         />
 
         {/* --- SCROLLABLE CHAT AREA --- */}
@@ -718,155 +748,171 @@ const App: React.FC<AppProps> = ({ user }) => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 w-full max-w-6xl px-4">
                     
                     {/* 1. CONTENT GENERATION */}
-                    <div 
-                        onClick={() => handleModuleSelect(ModuleType.CODE, { preset: 'SOCIAL_REEL', format: 'MARKDOWN' }, true)}
-                        className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 h-40 cursor-pointer transition-colors duration-200 hover:border-violet-500/50 md:transition-all md:hover:-translate-y-1 shadow-lg hover:shadow-violet-900/20"
-                    >
-                        <div className="absolute -right-2 -bottom-2 w-20 h-20 text-neutral-500/10 pointer-events-none transform rotate-12 transition-colors duration-300 md:group-hover:text-white/5 md:group-hover:scale-110 md:group-hover:rotate-6">
-                            {GHOST_ICONS[ModuleType.CODE]}
-                        </div>
-                        
-                        <div className="relative z-10 flex flex-col h-full justify-between">
-                            <div>
-                                <h3 className="text-violet-400 font-mono text-[10px] uppercase tracking-widest font-bold mb-1">WORKFLOW #1</h3>
-                                <h2 className="text-white font-bold text-lg leading-tight">Content Generation</h2>
+                    <div className="w-full h-40">
+                        <div 
+                            onClick={() => handleModuleSelect(ModuleType.CODE, { preset: 'GENERAL', format: 'MARKDOWN' }, true)}
+                            className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 h-full cursor-pointer transition-colors duration-200 hover:border-violet-500/50 md:transition-all md:hover:-translate-y-1 shadow-lg hover:shadow-violet-900/20 isolate"
+                        >
+                            <div className="absolute -right-2 -bottom-2 w-20 h-20 text-neutral-500/10 pointer-events-none transform rotate-12 transition-colors duration-300 md:group-hover:text-white/5 md:group-hover:scale-110 md:group-hover:rotate-6">
+                                {GHOST_ICONS[ModuleType.CODE]}
                             </div>
-                            <p className="text-gray-400 text-[10px] leading-relaxed font-light">
-                                Reels, carruseles, posts y captions. Contenido listo para publicar con estrategia incluida.
-                            </p>
+                            
+                            <div className="relative z-10 flex flex-col h-full justify-between">
+                                <div>
+                                    <h3 className="text-violet-400 font-mono text-[10px] uppercase tracking-widest font-bold mb-1">WORKFLOW #1</h3>
+                                    <h2 className="text-white font-bold text-lg leading-tight">{t('workflow_1_title')}</h2>
+                                </div>
+                                <p className="text-gray-400 text-[10px] leading-relaxed font-light">
+                                    {t('workflow_1_desc')}
+                                </p>
+                            </div>
                         </div>
                     </div>
 
                     {/* 2. SMART CALENDAR */}
-                    <div 
-                        onClick={() => handleModuleSelect(ModuleType.DESIGN, { preset: 'CALENDAR_CONTENT', format: 'MARKDOWN' }, true)}
-                        className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 h-40 cursor-pointer transition-colors duration-200 hover:border-amber-500/50 md:transition-all md:hover:-translate-y-1 shadow-lg hover:shadow-amber-900/20"
-                    >
-                        <div className="absolute -right-2 -bottom-2 w-20 h-20 text-neutral-500/10 pointer-events-none transform rotate-12 transition-colors duration-300 md:group-hover:text-white/5 md:group-hover:scale-110 md:group-hover:rotate-6">
-                            {GHOST_ICONS[ModuleType.DESIGN]}
-                        </div>
-                        <div className="relative z-10 flex flex-col h-full justify-between">
-                            <div>
-                                <h3 className="text-amber-400 font-mono text-[10px] uppercase tracking-widest font-bold mb-1">WORKFLOW #2</h3>
-                                <h2 className="text-white font-bold text-lg leading-tight">Smart Calendar</h2>
+                    <div className="w-full h-40">
+                        <div 
+                            onClick={() => handleModuleSelect(ModuleType.DESIGN, { preset: 'GENERAL', format: 'MARKDOWN' }, true)}
+                            className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 h-full cursor-pointer transition-colors duration-200 hover:border-amber-500/50 md:transition-all md:hover:-translate-y-1 shadow-lg hover:shadow-amber-900/20 isolate"
+                        >
+                            <div className="absolute -right-2 -bottom-2 w-20 h-20 text-neutral-500/10 pointer-events-none transform rotate-12 transition-colors duration-300 md:group-hover:text-white/5 md:group-hover:scale-110 md:group-hover:rotate-6">
+                                {GHOST_ICONS[ModuleType.DESIGN]}
                             </div>
-                            <p className="text-gray-400 text-[10px] leading-relaxed font-light">
-                                Calendarios de contenido, tareas, proyectos y lanzamientos. Tu plan, estructurado al instante.
-                            </p>
+                            <div className="relative z-10 flex flex-col h-full justify-between">
+                                <div>
+                                    <h3 className="text-amber-400 font-mono text-[10px] uppercase tracking-widest font-bold mb-1">WORKFLOW #2</h3>
+                                    <h2 className="text-white font-bold text-lg leading-tight">{t('workflow_2_title')}</h2>
+                                </div>
+                                <p className="text-gray-400 text-[10px] leading-relaxed font-light">
+                                    {t('workflow_2_desc')}
+                                </p>
+                            </div>
                         </div>
                     </div>
 
                     {/* 3. SEO & CAMPAIGNS */}
-                    <div 
-                        onClick={() => handleModuleSelect(ModuleType.SEO, { preset: 'SEO_AUDIT', format: 'MARKDOWN' }, true)}
-                        className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 h-40 cursor-pointer transition-colors duration-200 hover:border-teal-500/50 md:transition-all md:hover:-translate-y-1 shadow-lg hover:shadow-teal-900/20"
-                    >
-                        <div className="absolute -right-2 -bottom-2 w-20 h-20 text-neutral-500/10 pointer-events-none transform rotate-12 transition-colors duration-300 md:group-hover:text-white/5 md:group-hover:scale-110 md:group-hover:rotate-6">
-                            {GHOST_ICONS[ModuleType.SEO]}
-                        </div>
-                        <div className="relative z-10 flex flex-col h-full justify-between">
-                            <div>
-                                <h3 className="text-teal-500 font-mono text-[10px] uppercase tracking-widest font-bold mb-1">WORKFLOW #3</h3>
-                                <h2 className="text-white font-bold text-lg leading-tight">SEO & Growth</h2>
+                    <div className="w-full h-40">
+                        <div 
+                            onClick={() => handleModuleSelect(ModuleType.SEO, { preset: 'GENERAL', format: 'MARKDOWN' }, true)}
+                            className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 h-full cursor-pointer transition-colors duration-200 hover:border-teal-500/50 md:transition-all md:hover:-translate-y-1 shadow-lg hover:shadow-teal-900/20 isolate"
+                        >
+                            <div className="absolute -right-2 -bottom-2 w-20 h-20 text-neutral-500/10 pointer-events-none transform rotate-12 transition-colors duration-300 md:group-hover:text-white/5 md:group-hover:scale-110 md:group-hover:rotate-6">
+                                {GHOST_ICONS[ModuleType.SEO]}
                             </div>
-                            <p className="text-gray-400 text-[10px] leading-relaxed font-light">
-                                Organic and Paid dominance. Technical audits, EEAT strategy, and ad copy designed to convert.
-                            </p>
+                            <div className="relative z-10 flex flex-col h-full justify-between">
+                                <div>
+                                    <h3 className="text-teal-500 font-mono text-[10px] uppercase tracking-widest font-bold mb-1">WORKFLOW #3</h3>
+                                    <h2 className="text-white font-bold text-lg leading-tight">{t('workflow_3_title')}</h2>
+                                </div>
+                                <p className="text-gray-400 text-[10px] leading-relaxed font-light">
+                                    {t('workflow_3_desc')}
+                                </p>
+                            </div>
                         </div>
                     </div>
 
                     {/* 4. DATA & STRUCTURE */}
-                    <div 
-                        onClick={() => handleModuleSelect(ModuleType.STRUCTURE, { preset: 'NOTES', format: 'JSON' }, true)}
-                        className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 h-40 cursor-pointer transition-colors duration-200 hover:border-purple-500/50 md:transition-all md:hover:-translate-y-1 shadow-lg hover:shadow-purple-900/20"
-                    >
-                        <div className="absolute -right-2 -bottom-2 w-20 h-20 text-neutral-500/10 pointer-events-none transform rotate-12 transition-colors duration-300 md:group-hover:text-white/5 md:group-hover:scale-110 md:group-hover:rotate-6">
-                            {GHOST_ICONS[ModuleType.STRUCTURE]}
-                        </div>
-                        <div className="relative z-10 flex flex-col h-full justify-between">
-                            <div>
-                                <h3 className="text-purple-500 font-mono text-[10px] uppercase tracking-widest font-bold mb-1">WORKFLOW #4</h3>
-                                <h2 className="text-white font-bold text-lg leading-tight">Voice to Structure</h2>
+                    <div className="w-full h-40">
+                        <div 
+                            onClick={() => handleModuleSelect(ModuleType.STRUCTURE, { preset: 'GENERAL', format: 'JSON' }, true)}
+                            className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 h-full cursor-pointer transition-colors duration-200 hover:border-purple-500/50 md:transition-all md:hover:-translate-y-1 shadow-lg hover:shadow-purple-900/20 isolate"
+                        >
+                            <div className="absolute -right-2 -bottom-2 w-20 h-20 text-neutral-500/10 pointer-events-none transform rotate-12 transition-colors duration-300 md:group-hover:text-white/5 md:group-hover:scale-110 md:group-hover:rotate-6">
+                                {GHOST_ICONS[ModuleType.STRUCTURE]}
                             </div>
-                            <p className="text-gray-400 text-[10px] leading-relaxed font-light">
-                                Chaos to Order. Synthesize messy voice notes into rigid data structures, valid JSON, or technical documentation.
-                            </p>
+                            <div className="relative z-10 flex flex-col h-full justify-between">
+                                <div>
+                                    <h3 className="text-purple-500 font-mono text-[10px] uppercase tracking-widest font-bold mb-1">WORKFLOW #4</h3>
+                                    <h2 className="text-white font-bold text-lg leading-tight">{t('workflow_4_title')}</h2>
+                                </div>
+                                <p className="text-gray-400 text-[10px] leading-relaxed font-light">
+                                    {t('workflow_4_desc')}
+                                </p>
+                            </div>
                         </div>
                     </div>
 
                     {/* 5. COPY ALCHEMIST */}
-                    <div 
-                        onClick={() => handleModuleSelect(ModuleType.WRITING, { preset: 'EMAIL' }, true)}
-                        className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 h-40 cursor-pointer transition-colors duration-200 hover:border-green-500/50 md:transition-all md:hover:-translate-y-1 shadow-lg hover:shadow-green-900/20"
-                    >
-                        <div className="absolute -right-2 -bottom-2 w-20 h-20 text-neutral-500/10 pointer-events-none transform rotate-12 transition-colors duration-300 md:group-hover:text-white/5 md:group-hover:scale-110 md:group-hover:rotate-6">
-                            {GHOST_ICONS[ModuleType.WRITING]}
-                        </div>
-                        <div className="relative z-10 flex flex-col h-full justify-between">
-                            <div>
-                                <h3 className="text-green-500 font-mono text-[10px] uppercase tracking-widest font-bold mb-1">WORKFLOW #5</h3>
-                                <h2 className="text-white font-bold text-lg leading-tight">Pro Refinement</h2>
+                    <div className="w-full h-40">
+                        <div 
+                            onClick={() => handleModuleSelect(ModuleType.WRITING, { preset: 'GENERAL', format: 'MARKDOWN' }, true)}
+                            className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 h-full cursor-pointer transition-colors duration-200 hover:border-green-500/50 md:transition-all md:hover:-translate-y-1 shadow-lg hover:shadow-green-900/20 isolate"
+                        >
+                            <div className="absolute -right-2 -bottom-2 w-20 h-20 text-neutral-500/10 pointer-events-none transform rotate-12 transition-colors duration-300 md:group-hover:text-white/5 md:group-hover:scale-110 md:group-hover:rotate-6">
+                                {GHOST_ICONS[ModuleType.WRITING]}
                             </div>
-                            <p className="text-gray-400 text-[10px] leading-relaxed font-light">
-                                Persuasive Engineering. Elevate drafts to hypnotic narratives using psychological frameworks (AIDA, PAS).
-                            </p>
+                            <div className="relative z-10 flex flex-col h-full justify-between">
+                                <div>
+                                    <h3 className="text-green-500 font-mono text-[10px] uppercase tracking-widest font-bold mb-1">WORKFLOW #5</h3>
+                                    <h2 className="text-white font-bold text-lg leading-tight">{t('workflow_5_title')}</h2>
+                                </div>
+                                <p className="text-gray-400 text-[10px] leading-relaxed font-light">
+                                    {t('workflow_5_desc')}
+                                </p>
+                            </div>
                         </div>
                     </div>
 
                     {/* 6. TABLES & CSV */}
-                    <div 
-                        onClick={() => handleModuleSelect(ModuleType.TABLES, { preset: 'CONTENT_CALENDAR', format: 'CSV' }, true)}
-                        className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 h-40 cursor-pointer transition-colors duration-200 hover:border-cyan-500/50 md:transition-all md:hover:-translate-y-1 shadow-lg hover:shadow-cyan-900/20"
-                    >
-                        <div className="absolute -right-2 -bottom-2 w-20 h-20 text-neutral-500/10 pointer-events-none transform rotate-12 transition-colors duration-300 md:group-hover:text-white/5 md:group-hover:scale-110 md:group-hover:rotate-6">
-                            {GHOST_ICONS[ModuleType.TABLES]}
-                        </div>
-                        <div className="relative z-10 flex flex-col h-full justify-between">
-                            <div>
-                                <h3 className="text-cyan-500 font-mono text-[10px] uppercase tracking-widest font-bold mb-1">WORKFLOW #6</h3>
-                                <h2 className="text-white font-bold text-lg leading-tight">Table Engine</h2>
+                    <div className="w-full h-40">
+                        <div 
+                            onClick={() => handleModuleSelect(ModuleType.TABLES, { preset: 'GENERAL', format: 'CSV' }, true)}
+                            className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 h-full cursor-pointer transition-colors duration-200 hover:border-cyan-500/50 md:transition-all md:hover:-translate-y-1 shadow-lg hover:shadow-cyan-900/20 isolate"
+                        >
+                            <div className="absolute -right-2 -bottom-2 w-20 h-20 text-neutral-500/10 pointer-events-none transform rotate-12 transition-colors duration-300 md:group-hover:text-white/5 md:group-hover:scale-110 md:group-hover:rotate-6">
+                                {GHOST_ICONS[ModuleType.TABLES]}
                             </div>
-                            <p className="text-gray-400 text-[10px] leading-relaxed font-light">
-                                Data Matrix. Generate content calendars and complex databases, exportable directly to CSV.
-                            </p>
+                            <div className="relative z-10 flex flex-col h-full justify-between">
+                                <div>
+                                    <h3 className="text-cyan-500 font-mono text-[10px] uppercase tracking-widest font-bold mb-1">WORKFLOW #6</h3>
+                                    <h2 className="text-white font-bold text-lg leading-tight">{t('workflow_6_title')}</h2>
+                                </div>
+                                <p className="text-gray-400 text-[10px] leading-relaxed font-light">
+                                    {t('workflow_6_desc')}
+                                </p>
+                            </div>
                         </div>
                     </div>
 
                     {/* 7. META PROMPTING */}
-                    <div 
-                        onClick={() => handleModuleSelect(ModuleType.PROMPT, { preset: 'PROMPT', format: 'MARKDOWN' }, true)}
-                        className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 h-40 cursor-pointer transition-colors duration-200 hover:border-orange-500/50 md:transition-all md:hover:-translate-y-1 shadow-lg hover:shadow-orange-900/20"
-                    >
-                        <div className="absolute -right-2 -bottom-2 w-20 h-20 text-neutral-500/10 pointer-events-none transform rotate-12 transition-colors duration-300 md:group-hover:text-white/5 md:group-hover:scale-110 md:group-hover:rotate-6">
-                            {GHOST_ICONS[ModuleType.PROMPT]}
-                        </div>
-                        <div className="relative z-10 flex flex-col h-full justify-between">
-                            <div>
-                                <h3 className="text-orange-500 font-mono text-[10px] uppercase tracking-widest font-bold mb-1">WORKFLOW #7</h3>
-                                <h2 className="text-white font-bold text-lg leading-tight">Universal Prompt</h2>
+                    <div className="w-full h-40">
+                        <div 
+                            onClick={() => handleModuleSelect(ModuleType.PROMPT, { preset: 'GENERAL', format: 'MARKDOWN' }, true)}
+                            className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 h-full cursor-pointer transition-colors duration-200 hover:border-orange-500/50 md:transition-all md:hover:-translate-y-1 shadow-lg hover:shadow-orange-900/20 isolate"
+                        >
+                            <div className="absolute -right-2 -bottom-2 w-20 h-20 text-neutral-500/10 pointer-events-none transform rotate-12 transition-colors duration-300 md:group-hover:text-white/5 md:group-hover:scale-110 md:group-hover:rotate-6">
+                                {GHOST_ICONS[ModuleType.PROMPT]}
                             </div>
-                            <p className="text-gray-400 text-[10px] leading-relaxed font-light">
-                                Meta-Programming. Design master instructions to dominate Midjourney v6, Flux, or XML Systems.
-                            </p>
+                            <div className="relative z-10 flex flex-col h-full justify-between">
+                                <div>
+                                    <h3 className="text-orange-500 font-mono text-[10px] uppercase tracking-widest font-bold mb-1">WORKFLOW #7</h3>
+                                    <h2 className="text-white font-bold text-lg leading-tight">{t('workflow_7_title')}</h2>
+                                </div>
+                                <p className="text-gray-400 text-[10px] leading-relaxed font-light">
+                                    {t('workflow_7_desc')}
+                                </p>
+                            </div>
                         </div>
                     </div>
 
                     {/* 8. IDEATION */}
-                    <div 
-                        onClick={() => handleModuleSelect(ModuleType.IDEATION, { preset: 'GENERAL', format: 'MARKDOWN' }, true)}
-                        className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 h-40 cursor-pointer transition-colors duration-200 hover:border-pink-500/50 md:transition-all md:hover:-translate-y-1 shadow-lg hover:shadow-pink-900/20"
-                    >
-                        <div className="absolute -right-2 -bottom-2 w-20 h-20 text-neutral-500/10 pointer-events-none transform rotate-12 transition-colors duration-300 md:group-hover:text-white/5 md:group-hover:scale-110 md:group-hover:rotate-6">
-                            {GHOST_ICONS[ModuleType.IDEATION]}
-                        </div>
-                        <div className="relative z-10 flex flex-col h-full justify-between">
-                            <div>
-                                <h3 className="text-pink-500 font-mono text-[10px] uppercase tracking-widest font-bold mb-1">WORKFLOW #8</h3>
-                                <h2 className="text-white font-bold text-lg leading-tight">Brainstorming</h2>
+                    <div className="w-full h-40">
+                        <div 
+                            onClick={() => handleModuleSelect(ModuleType.IDEATION, { preset: 'GENERAL', format: 'MARKDOWN' }, true)}
+                            className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 h-full cursor-pointer transition-colors duration-200 hover:border-pink-500/50 md:transition-all md:hover:-translate-y-1 shadow-lg hover:shadow-pink-900/20 isolate"
+                        >
+                            <div className="absolute -right-2 -bottom-2 w-20 h-20 text-neutral-500/10 pointer-events-none transform rotate-12 transition-colors duration-300 md:group-hover:text-white/5 md:group-hover:scale-110 md:group-hover:rotate-6">
+                                {GHOST_ICONS[ModuleType.IDEATION]}
                             </div>
-                            <p className="text-gray-400 text-[10px] leading-relaxed font-light">
-                                Creative Unlocking. Expand horizons with lateral thinking, SCAMPER, and First Principles.
-                            </p>
+                            <div className="relative z-10 flex flex-col h-full justify-between">
+                                <div>
+                                    <h3 className="text-pink-500 font-mono text-[10px] uppercase tracking-widest font-bold mb-1">WORKFLOW #8</h3>
+                                    <h2 className="text-white font-bold text-lg leading-tight">{t('workflow_8_title')}</h2>
+                                </div>
+                                <p className="text-gray-400 text-[10px] leading-relaxed font-light">
+                                    {t('workflow_8_desc')}
+                                </p>
+                            </div>
                         </div>
                     </div>
 
@@ -905,6 +951,7 @@ const App: React.FC<AppProps> = ({ user }) => {
                                 isTableContent={activeModule === ModuleType.TABLES}
                                 module={activeModule}
                                 preset={input.preset}
+                                uiLanguage={uiLanguage}
                             />
                         )}
                     </div>
@@ -934,9 +981,9 @@ const App: React.FC<AppProps> = ({ user }) => {
                 className="pointer-events-auto bg-[#0a0a0a] border border-b-0 border-white/10 rounded-t-xl px-8 py-2 text-[10px] font-mono font-bold text-gray-400 hover:text-white transition-all shadow-[0_-5px_20px_rgba(0,0,0,0.5)] flex items-center gap-2 group tracking-widest"
              >
                 {isSettingsPanelOpen ? (
-                   <><div className="w-2 h-0.5 bg-gray-500 group-hover:bg-white rounded-full transition-colors"></div> OCULTAR</>
+                   <><div className="w-2 h-0.5 bg-gray-500 group-hover:bg-white rounded-full transition-colors"></div> {t('hide')}</>
                 ) : (
-                   <><div className="w-2 h-0.5 bg-gray-500 group-hover:bg-white rounded-full transition-colors"></div> INPUT PANEL</>
+                   <><div className="w-2 h-0.5 bg-gray-500 group-hover:bg-white rounded-full transition-colors"></div> {t('input_panel')}</>
                 )}
              </button>
           </div>
@@ -1042,9 +1089,9 @@ const App: React.FC<AppProps> = ({ user }) => {
                     
                     {/* Select Wrapper Helper */}
                     {([
-                        { value: input.language, options: Object.entries(LANGUAGES), setter: (v: string) => setInput(p => ({ ...p, language: v as TargetLanguage })) },
-                        { value: input.preset, options: MODULE_SPECIFIC_CONFIG[activeModule].validPresets.map(p => [p, PRESETS[p]]), setter: (v: string) => setInput(p => ({ ...p, preset: v as PresetType })) },
-                        { value: input.format, options: MODULE_SPECIFIC_CONFIG[activeModule].validFormats.map(f => [f, FORMATS[f]]), setter: (v: string) => setInput(p => ({ ...p, format: v as OutputFormat })) }
+                        { value: input.language, options: Object.entries(LOCALIZED_LANGUAGES[uiLanguage]), setter: (v: string) => setInput(p => ({ ...p, language: v as TargetLanguage })) },
+                        { value: input.preset, options: MODULE_SPECIFIC_CONFIG[activeModule].validPresets.map(p => [p, LOCALIZED_PRESETS[uiLanguage][p]]), setter: (v: string) => setInput(p => ({ ...p, preset: v as PresetType })) },
+                        { value: input.format, options: MODULE_SPECIFIC_CONFIG[activeModule].validFormats.map(f => [f, LOCALIZED_FORMATS[uiLanguage][f]]), setter: (v: string) => setInput(p => ({ ...p, format: v as OutputFormat })) }
                     ] as const).map((item, idx) => (
                         <div key={idx} className="relative group">
                             <select 
@@ -1067,7 +1114,7 @@ const App: React.FC<AppProps> = ({ user }) => {
                     <button 
                         onClick={handleImageUploadClick} 
                         className="p-3 mb-0.5 rounded-full text-gray-500 hover:text-white hover:bg-white/5 transition-all flex-shrink-0"
-                        title="Subir Imagen"
+                        title={uiLanguage === 'es' ? 'Subir Imagen' : 'Upload Image'}
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="m18.375 12.739-7.693 7.693a4.5 4.5 0 0 1-6.364-6.364l10.94-10.94A3 3 0 1 1 19.5 7.372L8.552 18.32m.009-.01-.01.01m5.699-9.941-7.81 7.81a1.5 1.5 0 0 0 2.112 2.13" /></svg>
                     </button>
@@ -1077,7 +1124,7 @@ const App: React.FC<AppProps> = ({ user }) => {
                         value={input.text}
                         onChange={(e) => setInput(prev => ({ ...prev, text: e.target.value }))}
                         onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleTextSubmit(); } }}
-                        placeholder="Describe tu idea, pega contenido o usa el micrófono..."
+                        placeholder={t('textarea_placeholder')}
                         className="flex-1 bg-transparent border-0 outline-none text-sm text-gray-200 placeholder-gray-600 resize-none max-h-32 py-3.5 scrollbar-hide font-light"
                         rows={1}
                     />
@@ -1086,13 +1133,13 @@ const App: React.FC<AppProps> = ({ user }) => {
                         <button 
                             onClick={handleTextSubmit}
                             className="p-3 mb-0.5 rounded-full bg-gradient-to-br from-blue-600 to-blue-700 text-white hover:to-blue-600 transition-all flex-shrink-0 shadow-[0_0_15px_rgba(37,99,235,0.2)] hover:shadow-[0_0_20px_rgba(37,99,235,0.4)] animate-fade-in"
-                            title="Enviar"
+                            title={uiLanguage === 'es' ? 'Enviar' : 'Send'}
                         >
                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18" /></svg>
                         </button>
                     ) : (
                         <div className="mb-0.5">
-                            <AudioInput onAudioCapture={handleAudioCapture} onClear={handleClearAudio} currentAudio={input.audio} />
+                            <AudioInput onAudioCapture={handleAudioCapture} onClear={handleClearAudio} currentAudio={input.audio} lang={uiLanguage} />
                         </div>
                     )}
                 </div>

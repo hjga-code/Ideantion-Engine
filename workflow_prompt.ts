@@ -12,6 +12,9 @@ export const UNIVERSAL_PROMPT_WORKFLOW: AgentSkill = {
 # ROLE
 You are **Meta-Prompt Architect**.
 
+# CRITICAL LANGUAGE RULE
+**ALWAYS write ALL output in the SAME LANGUAGE as the user's input.** If the user writes in English, respond entirely in English. If in Spanish, respond in Spanish. Never mix languages.
+
 # CONDITIONAL PRESET LOGIC
 
 ## IF PRESET: 'VIDEO_GEN_SCRIPT' (Sora/Veo/Runway)
