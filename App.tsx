@@ -715,14 +715,14 @@ const App: React.FC<AppProps> = ({ user }) => {
               <div className="flex flex-col items-center justify-start mt-10 select-none space-y-4 animate-fade-in">
 
                 {/* 8-GRID WORKFLOW LAYOUT (REDESIGNED: SVG GHOST ICONS) */}
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 w-full max-w-6xl px-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 w-full max-w-6xl px-4">
                     
                     {/* 1. CONTENT GENERATION */}
                     <div 
                         onClick={() => handleModuleSelect(ModuleType.CODE, { preset: 'SOCIAL_REEL', format: 'MARKDOWN' }, true)}
-                        className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 h-40 cursor-pointer hover:border-violet-500/50 transition-all hover:-translate-y-1 shadow-lg hover:shadow-violet-900/20"
+                        className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 h-40 cursor-pointer transition-colors duration-200 hover:border-violet-500/50 md:transition-all md:hover:-translate-y-1 shadow-lg hover:shadow-violet-900/20"
                     >
-                        <div className="absolute -right-2 -bottom-2 w-20 h-20 text-neutral-500/10 group-hover:text-white/5 transition-all duration-500 transform rotate-12 scale-100 group-hover:scale-110 group-hover:rotate-6">
+                        <div className="absolute -right-2 -bottom-2 w-20 h-20 text-neutral-500/10 pointer-events-none transform rotate-12 transition-colors duration-300 md:group-hover:text-white/5 md:group-hover:scale-110 md:group-hover:rotate-6">
                             {GHOST_ICONS[ModuleType.CODE]}
                         </div>
                         
@@ -740,9 +740,9 @@ const App: React.FC<AppProps> = ({ user }) => {
                     {/* 2. SMART CALENDAR */}
                     <div 
                         onClick={() => handleModuleSelect(ModuleType.DESIGN, { preset: 'CALENDAR_CONTENT', format: 'MARKDOWN' }, true)}
-                        className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 h-40 cursor-pointer hover:border-amber-500/50 transition-all hover:-translate-y-1 shadow-lg hover:shadow-amber-900/20"
+                        className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 h-40 cursor-pointer transition-colors duration-200 hover:border-amber-500/50 md:transition-all md:hover:-translate-y-1 shadow-lg hover:shadow-amber-900/20"
                     >
-                         <div className="absolute -right-2 -bottom-2 w-20 h-20 text-neutral-500/10 group-hover:text-white/5 transition-all duration-500 transform rotate-12 scale-100 group-hover:scale-110 group-hover:rotate-6">
+                        <div className="absolute -right-2 -bottom-2 w-20 h-20 text-neutral-500/10 pointer-events-none transform rotate-12 transition-colors duration-300 md:group-hover:text-white/5 md:group-hover:scale-110 md:group-hover:rotate-6">
                             {GHOST_ICONS[ModuleType.DESIGN]}
                         </div>
                         <div className="relative z-10 flex flex-col h-full justify-between">
@@ -759,9 +759,9 @@ const App: React.FC<AppProps> = ({ user }) => {
                     {/* 3. SEO & CAMPAIGNS */}
                     <div 
                         onClick={() => handleModuleSelect(ModuleType.SEO, { preset: 'SEO_AUDIT', format: 'MARKDOWN' }, true)}
-                        className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 h-40 cursor-pointer hover:border-teal-500/50 transition-all hover:-translate-y-1 shadow-lg hover:shadow-teal-900/20"
+                        className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 h-40 cursor-pointer transition-colors duration-200 hover:border-teal-500/50 md:transition-all md:hover:-translate-y-1 shadow-lg hover:shadow-teal-900/20"
                     >
-                         <div className="absolute -right-2 -bottom-2 w-20 h-20 text-neutral-500/10 group-hover:text-white/5 transition-all duration-500 transform rotate-12 scale-100 group-hover:scale-110 group-hover:rotate-6">
+                        <div className="absolute -right-2 -bottom-2 w-20 h-20 text-neutral-500/10 pointer-events-none transform rotate-12 transition-colors duration-300 md:group-hover:text-white/5 md:group-hover:scale-110 md:group-hover:rotate-6">
                             {GHOST_ICONS[ModuleType.SEO]}
                         </div>
                         <div className="relative z-10 flex flex-col h-full justify-between">
@@ -778,9 +778,9 @@ const App: React.FC<AppProps> = ({ user }) => {
                     {/* 4. DATA & STRUCTURE */}
                     <div 
                         onClick={() => handleModuleSelect(ModuleType.STRUCTURE, { preset: 'NOTES', format: 'JSON' }, true)}
-                        className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 h-40 cursor-pointer hover:border-purple-500/50 transition-all hover:-translate-y-1 shadow-lg hover:shadow-purple-900/20"
+                        className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 h-40 cursor-pointer transition-colors duration-200 hover:border-purple-500/50 md:transition-all md:hover:-translate-y-1 shadow-lg hover:shadow-purple-900/20"
                     >
-                         <div className="absolute -right-2 -bottom-2 w-20 h-20 text-neutral-500/10 group-hover:text-white/5 transition-all duration-500 transform rotate-12 scale-100 group-hover:scale-110 group-hover:rotate-6">
+                        <div className="absolute -right-2 -bottom-2 w-20 h-20 text-neutral-500/10 pointer-events-none transform rotate-12 transition-colors duration-300 md:group-hover:text-white/5 md:group-hover:scale-110 md:group-hover:rotate-6">
                             {GHOST_ICONS[ModuleType.STRUCTURE]}
                         </div>
                         <div className="relative z-10 flex flex-col h-full justify-between">
@@ -797,9 +797,9 @@ const App: React.FC<AppProps> = ({ user }) => {
                     {/* 5. COPY ALCHEMIST */}
                     <div 
                         onClick={() => handleModuleSelect(ModuleType.WRITING, { preset: 'EMAIL' }, true)}
-                        className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 h-40 cursor-pointer hover:border-green-500/50 transition-all hover:-translate-y-1 shadow-lg hover:shadow-green-900/20"
+                        className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 h-40 cursor-pointer transition-colors duration-200 hover:border-green-500/50 md:transition-all md:hover:-translate-y-1 shadow-lg hover:shadow-green-900/20"
                     >
-                         <div className="absolute -right-2 -bottom-2 w-20 h-20 text-neutral-500/10 group-hover:text-white/5 transition-all duration-500 transform rotate-12 scale-100 group-hover:scale-110 group-hover:rotate-6">
+                        <div className="absolute -right-2 -bottom-2 w-20 h-20 text-neutral-500/10 pointer-events-none transform rotate-12 transition-colors duration-300 md:group-hover:text-white/5 md:group-hover:scale-110 md:group-hover:rotate-6">
                             {GHOST_ICONS[ModuleType.WRITING]}
                         </div>
                         <div className="relative z-10 flex flex-col h-full justify-between">
@@ -813,12 +813,12 @@ const App: React.FC<AppProps> = ({ user }) => {
                         </div>
                     </div>
 
-                     {/* 6. TABLES & CSV */}
-                     <div 
+                    {/* 6. TABLES & CSV */}
+                    <div 
                         onClick={() => handleModuleSelect(ModuleType.TABLES, { preset: 'CONTENT_CALENDAR', format: 'CSV' }, true)}
-                        className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 h-40 cursor-pointer hover:border-cyan-500/50 transition-all hover:-translate-y-1 shadow-lg hover:shadow-cyan-900/20"
+                        className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 h-40 cursor-pointer transition-colors duration-200 hover:border-cyan-500/50 md:transition-all md:hover:-translate-y-1 shadow-lg hover:shadow-cyan-900/20"
                     >
-                         <div className="absolute -right-2 -bottom-2 w-20 h-20 text-neutral-500/10 group-hover:text-white/5 transition-all duration-500 transform rotate-12 scale-100 group-hover:scale-110 group-hover:rotate-6">
+                        <div className="absolute -right-2 -bottom-2 w-20 h-20 text-neutral-500/10 pointer-events-none transform rotate-12 transition-colors duration-300 md:group-hover:text-white/5 md:group-hover:scale-110 md:group-hover:rotate-6">
                             {GHOST_ICONS[ModuleType.TABLES]}
                         </div>
                         <div className="relative z-10 flex flex-col h-full justify-between">
@@ -835,9 +835,9 @@ const App: React.FC<AppProps> = ({ user }) => {
                     {/* 7. META PROMPTING */}
                     <div 
                         onClick={() => handleModuleSelect(ModuleType.PROMPT, { preset: 'PROMPT', format: 'MARKDOWN' }, true)}
-                        className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 h-40 cursor-pointer hover:border-orange-500/50 transition-all hover:-translate-y-1 shadow-lg hover:shadow-orange-900/20"
+                        className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 h-40 cursor-pointer transition-colors duration-200 hover:border-orange-500/50 md:transition-all md:hover:-translate-y-1 shadow-lg hover:shadow-orange-900/20"
                     >
-                         <div className="absolute -right-2 -bottom-2 w-20 h-20 text-neutral-500/10 group-hover:text-white/5 transition-all duration-500 transform rotate-12 scale-100 group-hover:scale-110 group-hover:rotate-6">
+                        <div className="absolute -right-2 -bottom-2 w-20 h-20 text-neutral-500/10 pointer-events-none transform rotate-12 transition-colors duration-300 md:group-hover:text-white/5 md:group-hover:scale-110 md:group-hover:rotate-6">
                             {GHOST_ICONS[ModuleType.PROMPT]}
                         </div>
                         <div className="relative z-10 flex flex-col h-full justify-between">
@@ -854,9 +854,9 @@ const App: React.FC<AppProps> = ({ user }) => {
                     {/* 8. IDEATION */}
                     <div 
                         onClick={() => handleModuleSelect(ModuleType.IDEATION, { preset: 'GENERAL', format: 'MARKDOWN' }, true)}
-                        className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 h-40 cursor-pointer hover:border-pink-500/50 transition-all hover:-translate-y-1 shadow-lg hover:shadow-pink-900/20"
+                        className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 h-40 cursor-pointer transition-colors duration-200 hover:border-pink-500/50 md:transition-all md:hover:-translate-y-1 shadow-lg hover:shadow-pink-900/20"
                     >
-                         <div className="absolute -right-2 -bottom-2 w-20 h-20 text-neutral-500/10 group-hover:text-white/5 transition-all duration-500 transform rotate-12 scale-100 group-hover:scale-110 group-hover:rotate-6">
+                        <div className="absolute -right-2 -bottom-2 w-20 h-20 text-neutral-500/10 pointer-events-none transform rotate-12 transition-colors duration-300 md:group-hover:text-white/5 md:group-hover:scale-110 md:group-hover:rotate-6">
                             {GHOST_ICONS[ModuleType.IDEATION]}
                         </div>
                         <div className="relative z-10 flex flex-col h-full justify-between">
