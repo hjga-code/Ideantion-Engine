@@ -9,12 +9,13 @@ interface OutputRendererProps {
 }
 
 // ─── SMART TITLE ENGINE ──────────────────────────────────────────────────────
-// Layer 1: First H1/H2 heading extracted from AI output
-// Layer 2: Content pattern detection (detects structures like tables, scripts, schemas)
-// Layer 3: Preset → predefined professional title
-// Layer 4: Module default
+// L1: First H1/H2 heading from AI output (most specific)
+// L2: Topic extraction — what is this content actually ABOUT?
+// L3: Structural type detection (conservative, multi-signal)
+// L4: Preset lookup (only for non-GENERAL presets)
+// L5: Module default
 
-// L3 — Preset lookup table
+// L4 — Preset lookup table (GENERAL always tries to derive title from content)
 const PRESET_TITLES: Record<'en' | 'es', Record<string, string>> = {
   en: {
     // Content Generation
@@ -68,8 +69,8 @@ const PRESET_TITLES: Record<'en' | 'es', Record<string, string>> = {
     BLUE_OCEAN:          'Blue Ocean Strategy',
     STARTUP_VALIDATION:  'Startup Validation',
     PRE_MORTEM:          'Pre-Mortem Analysis',
-    // General
-    GENERAL: 'Document',
+    // General — empty string means: always derive from content
+    GENERAL: '',
   },
   es: {
     // Content Generation
@@ -123,16 +124,16 @@ const PRESET_TITLES: Record<'en' | 'es', Record<string, string>> = {
     BLUE_OCEAN:          'Estrategia Blue Ocean',
     STARTUP_VALIDATION:  'Validación de Startup',
     PRE_MORTEM:          'Análisis Pre-Mortem',
-    // General
-    GENERAL: 'Documento',
+    // General — empty string means: always derive from content
+    GENERAL: '',
   }
 };
 
-// L4 — Module default titles
+// L5 — Module default titles
 const MODULE_TITLES: Record<'en' | 'es', Record<string, string>> = {
   en: {
     CODE:      'Generated Content',
-    DESIGN:    'Calendar',
+    DESIGN:    'Planner',
     SEO:       'SEO Analysis',
     STRUCTURE: 'Data Structure',
     WRITING:   'Text Document',
@@ -142,60 +143,149 @@ const MODULE_TITLES: Record<'en' | 'es', Record<string, string>> = {
   },
   es: {
     CODE:      'Contenido Generado',
-    DESIGN:    'Calendario',
-    SEO:       'Análisis SEO',
+    DESIGN:    'Planificador',
+    SEO:       'Analisis SEO',
     STRUCTURE: 'Estructura de Datos',
     WRITING:   'Documento de Texto',
     TABLES:    'Tabla de Datos',
     PROMPT:    'Prompt',
-    IDEATION:  'Sesión de Ideación',
+    IDEATION:  'Sesion de Ideacion',
   }
 };
 
-// L2 — Detect document type from content patterns
-const detectFromContent = (content: string, lang: 'en' | 'es' = 'en'): string | null => {
-  // Calendar / planning tables
-  if (/\|\s*(Semana|Week|Lunes|Monday|Martes|Tuesday)/i.test(content))  return lang === 'es' ? 'Calendario de Contenidos' : 'Content Calendar';
-  if (/\|\s*(Sprint|Fase|Phase|Entregable|Deliverable)/i.test(content)) return lang === 'es' ? 'Calendario de Proyecto' : 'Project Calendar';
-  if (/\|\s*(Prioridad|Priority|GTD|Contexto|@computadora)/i.test(content)) return lang === 'es' ? 'Plan de Tareas GTD' : 'GTD Task Plan';
-  if (/Pre-lanzamiento|Pre-launch|Checklist de Lanzamiento/i.test(content)) return lang === 'es' ? 'Plan de Lanzamiento' : 'Launch Plan';
-  if (/Bloque Horario|Deep Work|Intenciones de la Semana/i.test(content)) return lang === 'es' ? 'Planificación Semanal' : 'Weekly Planning';
-  // Content formats
-  if (/\b(HOOK|GANCHO)\b[:\s]|\bCTA\b[:\s]/i.test(content))            return lang === 'es' ? 'Script de Reel' : 'Reel Script';
-  if (/Slide\s+\d+|Diapositiva\s+\d+|SLIDE\s+\d+/i.test(content))     return lang === 'es' ? 'Carrusel de Contenido' : 'Content Carousel';
-  if (/\bCaption\b[:\s]|\bCAPTION\b[:\s]/i.test(content))              return lang === 'es' ? 'Post + Caption' : 'Post + Caption';
-  // Financial / data
-  if (/P&amp;L|Revenue|EBITDA|Unit Economics|LTV|CAC/i.test(content))  return lang === 'es' ? 'Modelo Financiero' : 'Financial Model';
-  if (/\|\s*(Keyword|Palabra Clave).*\|\s*(Volume|Vol\.)/i.test(content)) return lang === 'es' ? 'Estrategia de Keywords' : 'Keyword Strategy';
-  if (/\b(CTR|ROAS|CPM|CPA)\b/i.test(content))                         return lang === 'es' ? 'Campaña Publicitaria' : 'Ad Campaign';
-  if (/\|\s*(Precio|Price|Plan|Tier)/i.test(content))                   return lang === 'es' ? 'Tabla de Precios' : 'Pricing Table';
-  if (/\|\s*(Tarea|Hito|Milestone|Task)/i.test(content))               return lang === 'es' ? 'Roadmap de Producto' : 'Product Roadmap';
-  // Technical / structure
-  if (/"type"\s*:\s*"object"|"properties"\s*:|"\$schema"/i.test(content)) return lang === 'es' ? 'Esquema JSON' : 'JSON Schema';
-  if (/Action Item|Acuerdos|DECISIONES|Próximos Pasos/i.test(content)) return lang === 'es' ? 'Actas de Reunión' : 'Meeting Minutes';
-  if (/\[\[.*?\]\]|#\w+.*?\|\|/i.test(content))                       return lang === 'es' ? 'Grafo de Conocimiento' : 'Knowledge Graph';
-  // Prompts
-  if (/--ar\s+\d+:\d+|--style|--chaos|--seed/i.test(content))          return lang === 'es' ? 'Prompt de Imagen' : 'Image Prompt';
-  if (/\[SYSTEM\]|<system>|<assistant>|\[INST\]/i.test(content))       return lang === 'es' ? 'System Instruction' : 'System Instruction';
+// L2 — Topic extraction: reads the AI output to understand what it's actually about
+const extractTopicFromContent = (content: string): string | null => {
+  const sample = content
+    .replace(/```[\s\S]*?```/g, '')
+    .replace(/\|[^\n]+\|/g, '')
+    .replace(/[*_`#>\-]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .slice(0, 600)
+    .trim();
+
+  if (!sample || sample.length < 10) return null;
+
+  // Check for bold title line: **Some Title**
+  const boldTitle = content.match(/^\*\*([^*\n]{4,70})\*\*/m);
+  if (boldTitle) {
+    const cleaned = boldTitle[1].trim().replace(/[*_`]/g, '');
+    if (cleaned.length > 3 && !/^(note|notes|summary|output|resultado|calendar type selected)/i.test(cleaned))
+      return cleaned.slice(0, 70);
+  }
+
+  // Schedule/plan type prefix
+  const scheduleMatch = sample.match(
+    /\b(daily|weekly|monthly|7[\s-]day|30[\s-]day|annual|yearly|diario|semanal|mensual)\b[\s\w]{0,25}?(schedule|plan|planner|calendar|routine|program|tracker|agenda|planificacion|calendario|rutina|programa)/i
+  );
+  if (scheduleMatch) {
+    return scheduleMatch[0].trim().replace(/\b\w/g, c => c.toUpperCase()).slice(0, 60);
+  }
+
+  const hasFitness   = /\b(exercise|workout|fitness|gym|hiit|yoga|training|entrenamiento|ejercicio|bienestar|wellness|health|salud)\b/i.test(sample);
+  const hasNutrition = /\b(breakfast|meal|diet|nutrition|desayuno|comida|nutricion|alimentacion|recipe|receta)\b/i.test(sample);
+  const hasReading   = /\b(reading|book|lecture|libros|lectura|aprender|learning)\b/i.test(sample);
+  const hasWeekly    = /\b(weekly|week|semanal|semana)\b/i.test(sample);
+
+  if (hasFitness && hasNutrition && hasReading) return hasWeekly ? 'Weekly Wellness & Learning Plan' : 'Wellness & Learning Plan';
+  if (hasFitness && hasNutrition)               return hasWeekly ? 'Weekly Fitness & Nutrition Plan' : 'Fitness & Nutrition Plan';
+  if (hasFitness && hasReading)                 return hasWeekly ? 'Weekly Fitness & Learning Plan'  : 'Fitness & Learning Plan';
+  if (hasFitness)                               return hasWeekly ? 'Weekly Fitness Plan'              : 'Fitness Plan';
+  if (hasNutrition && hasReading)               return 'Nutrition & Learning Plan';
+  if (hasNutrition)                             return 'Meal Plan';
+  if (hasReading)                               return 'Reading & Learning Plan';
+
+  if (/\b(habit|routine|rutina|habito|morning routine|evening routine|daily routine)\b/i.test(sample))
+    return 'Habit Tracker & Routine';
+  if (/\b(instagram|tiktok|linkedin|twitter|youtube|reel|carousel|content pillar)\b/i.test(sample))
+    return 'Social Media Plan';
+  if (/\b(launch|lanzamiento|go-to-market|product launch|startup)\b/i.test(sample))
+    return 'Launch Strategy';
+  if (/\b(marketing|campaign|campana|ad copy|advertising|publicidad)\b/i.test(sample))
+    return 'Marketing Plan';
+  if (/\b(revenue|profit|ebitda|financial|financiero|budget|presupuesto|roi)\b/i.test(sample))
+    return 'Financial Model';
+  if (/\b(keyword|seo|serp|backlink|traffic|ranking|posicionamiento)\b/i.test(sample))
+    return 'SEO Strategy';
+  if (/\b(productivity|task|gtd|project|sprint|deadline|entregable|tarea|proyecto)\b/i.test(sample))
+    return hasWeekly ? 'Weekly Work Plan' : 'Project Plan';
+
   return null;
 };
 
-// Main title resolver
+// L3 — Structural type detection (conservative: only fires on strong multi-signal patterns)
+const detectStructuralType = (content: string, lang: 'en' | 'es' = 'en'): string | null => {
+  // Social media content calendar — requires platform names + content pillars
+  if (/\b(Instagram|TikTok|LinkedIn)\b/i.test(content) &&
+      /\|\s*(Platform|Plataforma|Format|Formato)\s*\|/i.test(content) &&
+      /content\s+pillar|pilar\s+de\s+contenido/i.test(content))
+    return lang === 'es' ? 'Calendario de Contenidos' : 'Content Calendar';
+  // Project sprint — requires sprint + status columns
+  if (/\|\s*(Sprint|Phase|Fase)\s*\|/i.test(content) &&
+      /\|\s*(Status|Estado|Owner|Responsable)\s*\|/i.test(content))
+    return lang === 'es' ? 'Calendario de Proyecto' : 'Project Calendar';
+  // GTD — requires specific GTD context tags
+  if (/@(computer|computadora|meeting|reunion|call|llamada)/i.test(content) ||
+     (/\|\s*(P1|P2|P3)\s*\|/i.test(content) && /\|\s*(Contexto|Context)\s*\|/i.test(content)))
+    return lang === 'es' ? 'Plan de Tareas GTD' : 'GTD Task Plan';
+  // Launch — requires phases + KPI
+  if (/(Pre-launch|Pre-lanzamiento|Post-launch)/i.test(content) &&
+      /\|\s*(KPI|Canal|Channel)\s*\|/i.test(content))
+    return lang === 'es' ? 'Plan de Lanzamiento' : 'Launch Plan';
+  // Reel
+  if (/\b(HOOK|GANCHO)\b[\s:]/i.test(content) && /\bCTA\b[\s:]/i.test(content))
+    return lang === 'es' ? 'Script de Reel' : 'Reel Script';
+  // Carousel
+  if (/SLIDE\s+\d+|Diapositiva\s+\d+/i.test(content))
+    return lang === 'es' ? 'Carrusel de Contenido' : 'Content Carousel';
+  // Financial
+  if (/P&(?:amp;)?L|EBITDA|Unit Economics/i.test(content))
+    return lang === 'es' ? 'Modelo Financiero' : 'Financial Model';
+  // Keyword strategy
+  if (/\|\s*(Keyword|Palabra Clave).*\|\s*(Volume|Vol\.)/i.test(content))
+    return lang === 'es' ? 'Estrategia de Keywords' : 'Keyword Strategy';
+  // Ad metrics
+  if (/\b(CTR|ROAS|CPM|CPA)\b/i.test(content))
+    return lang === 'es' ? 'Campana Publicitaria' : 'Ad Campaign';
+  // Pricing table
+  if (/\|\s*(Precio|Price)\s*\|/i.test(content) && /\|\s*(Plan|Tier)\s*\|/i.test(content))
+    return lang === 'es' ? 'Tabla de Precios' : 'Pricing Table';
+  // JSON schema
+  if (/"type"\s*:\s*"object"|"properties"\s*:|"\$schema"/i.test(content))
+    return lang === 'es' ? 'Esquema JSON' : 'JSON Schema';
+  // Meeting notes
+  if (/Action Item|DECISIONES|Next Steps|Proximos Pasos/i.test(content))
+    return lang === 'es' ? 'Actas de Reunion' : 'Meeting Minutes';
+  // Image prompt
+  if (/--ar\s+\d+:\d+|--style|--chaos|--seed/i.test(content))
+    return lang === 'es' ? 'Prompt de Imagen' : 'Image Prompt';
+  // System instruction
+  if (/\[SYSTEM\]|<system>|<assistant>|\[INST\]/i.test(content))
+    return 'System Instruction';
+  return null;
+};
+
+
+// Main title resolver — intelligent, content-aware
 const generateDocTitle = (content: string, preset?: string, module?: string, lang: 'en' | 'es' = 'en'): string => {
-  // L1: First heading in AI output
+  // L1: First markdown H1/H2 heading from AI output
   const heading = content.match(/^#{1,2}\s+(.+)$/m);
   if (heading) {
     const cleaned = heading[1].trim().replace(/[*_`#]/g, '').slice(0, 80);
-    if (cleaned.length > 3) return cleaned;
+    if (cleaned.length > 3 && !/^(summary|resumen|output|resultado|calendar type selected)/i.test(cleaned))
+      return cleaned;
   }
-  // L2: Content pattern detection
-  const detected = detectFromContent(content, lang);
-  if (detected) return detected;
-  // L3: Preset lookup
-  if (preset && PRESET_TITLES[lang][preset] && PRESET_TITLES[lang][preset] !== 'Document' && PRESET_TITLES[lang][preset] !== 'Documento') {
-    return PRESET_TITLES[lang][preset];
+  // L2: Topic extraction (what is this content actually about?)
+  const topic = extractTopicFromContent(content);
+  if (topic) return topic;
+  // L3: Structural type detection (conservative, multi-signal)
+  const structural = detectStructuralType(content, lang);
+  if (structural) return structural;
+  // L4: Preset lookup — only for explicit non-GENERAL presets
+  if (preset && preset !== 'GENERAL') {
+    const presetTitle = PRESET_TITLES[lang][preset];
+    if (presetTitle) return presetTitle;
   }
-  // L4: Module default
+  // L5: Module default
   if (module && MODULE_TITLES[lang][module]) return MODULE_TITLES[lang][module];
   return lang === 'es' ? 'Documento' : 'Document';
 };
