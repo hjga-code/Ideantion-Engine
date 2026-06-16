@@ -37,10 +37,10 @@ body {
   }
 }
 
-/* ── Neon glow for active module selector buttons ────────────────────────────
-   box-shadow is paint-only on small static elements — no GPU layer promotion.
-   Each color matches the ring-*/border-* Tailwind classes in MODULE_THEMES.
-──────────────────────────────────────────────────────────────────────────── */
+/* Neon glow for active module selector buttons.
+   box-shadow is paint-only on small static elements - no GPU layer promotion.
+   Each color matches the ring and border Tailwind classes in MODULE_THEMES.
+*/
 .ring-violet-500\/60  { box-shadow: 0 0 8px 2px rgba(139,92,246,0.55),  0 0 20px 4px rgba(139,92,246,0.2);  }
 .ring-amber-500\/60   { box-shadow: 0 0 8px 2px rgba(245,158,11,0.55),  0 0 20px 4px rgba(245,158,11,0.2);  }
 .ring-teal-500\/60    { box-shadow: 0 0 8px 2px rgba(20,184,166,0.55),  0 0 20px 4px rgba(20,184,166,0.2);  }

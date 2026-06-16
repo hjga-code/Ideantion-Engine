@@ -834,18 +834,43 @@ const exportMarkdown = (text: string, label: string, theme: DocTheme) => {
   downloadBlob(new Blob([header + text], { type: 'text/markdown;charset=utf-8' }), `${label}-${getTimestamp()}.md`);
 };
 
-const exportPDF = (text: string, label: string, theme: DocTheme, lang: 'en' | 'es' = 'en') => {
-  const iframe = document.createElement('iframe');
-  iframe.style.position = 'fixed';
-  iframe.style.right = '0';
-  iframe.style.bottom = '0';
-  iframe.style.width = '0';
-  iframe.style.height = '0';
-  iframe.style.border = '0';
-  iframe.style.outline = 'none';
-  iframe.style.pointerEvents = 'none';
-  iframe.style.zIndex = '-9999';
+const isMobileBrowser = (): boolean => {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+    || ('ontouchstart' in window && window.innerWidth < 1024);
+};
 
+const exportPDF = (text: string, label: string, theme: DocTheme, lang: 'en' | 'es' = 'en') => {
+  const htmlContent = buildDocumentHTML(text, label, theme, lang, false);
+
+  if (isMobileBrowser()) {
+    // Mobile: open a new tab with the HTML and trigger print from there.
+    // iframe.print() is blocked on Android/iOS Chrome — new tab is the only reliable way.
+    const newTab = window.open('', '_blank');
+    if (!newTab) {
+      alert(lang === 'es'
+        ? 'Tu navegador bloqueó la ventana emergente. Permite ventanas emergentes para este sitio e intenta de nuevo.'
+        : 'Your browser blocked the popup. Please allow popups for this site and try again.');
+      return;
+    }
+    newTab.document.open();
+    newTab.document.write(htmlContent);
+    newTab.document.close();
+    // Small delay to ensure content is fully painted before print dialog
+    setTimeout(() => {
+      try {
+        newTab.focus();
+        newTab.print();
+      } catch (e) {
+        // print() blocked (rare) — leave tab open so user can print manually
+        console.warn('print() blocked, tab left open for manual print:', e);
+      }
+    }, 600);
+    return;
+  }
+
+  // Desktop: use hidden iframe (original behavior)
+  const iframe = document.createElement('iframe');
+  iframe.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0;outline:none;pointer-events:none;z-index:-9999';
   document.body.appendChild(iframe);
 
   const doc = iframe.contentWindow?.document || iframe.contentDocument;
@@ -862,25 +887,34 @@ const exportPDF = (text: string, label: string, theme: DocTheme, lang: 'en' | 'e
         iframe.contentWindow?.print();
       } catch (e) {
         console.error('Failed to print iframe:', e);
-        alert(lang === 'es' ? 'Hubo un problema al abrir el diálogo de impresión. Intenta copiar el texto directamente.' : 'There was a problem opening the print dialog. Try copying the text directly.');
+        alert(lang === 'es'
+          ? 'Hubo un problema al abrir el diálogo de impresión. Intenta copiar el texto directamente.'
+          : 'There was a problem opening the print dialog. Try copying the text directly.');
       }
-      
-      // Remove the iframe after a delay to ensure print dialog completed
-      setTimeout(() => {
-        try {
-          document.body.removeChild(iframe);
-        } catch (e) {}
-      }, 5000);
+      setTimeout(() => { try { document.body.removeChild(iframe); } catch (e) {} }, 5000);
     }, 500);
   };
 
   doc.open();
-  doc.write(buildDocumentHTML(text, label, theme, lang, false));
+  doc.write(htmlContent);
   doc.close();
 };
 
 const exportDOC = (text: string, label: string, theme: DocTheme, lang: 'en' | 'es' = 'en') => {
   const html = buildWordHTML(text, label, theme, lang);
+
+  if (isMobileBrowser()) {
+    // Mobile: .doc files from blob URLs are not openable by mobile browsers.
+    // Instead download as .html — opens natively in any mobile browser,
+    // and can be shared to Google Docs / Word via the share sheet.
+    downloadBlob(
+      new Blob([html], { type: 'text/html;charset=utf-8' }),
+      `${label}-${getTimestamp()}.html`
+    );
+    return;
+  }
+
+  // Desktop: original .doc download
   downloadBlob(
     new Blob(['\ufeff', html], { type: 'application/vnd.ms-word;charset=utf-8' }),
     `${label}-${getTimestamp()}.doc`
