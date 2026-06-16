@@ -137,15 +137,15 @@ const GHOST_ICONS: Record<ModuleType, React.ReactNode> = {
 };
 
 // --- DYNAMIC MODULE COLORS (For Glow Effects) ---
-const MODULE_THEMES: Record<ModuleType, { color: string, shadow: string, border: string }> = {
-    [ModuleType.CODE]: { color: 'text-violet-400', shadow: 'shadow-violet-500/40', border: 'border-violet-500/50' },
-    [ModuleType.DESIGN]: { color: 'text-amber-400', shadow: 'shadow-amber-500/40', border: 'border-amber-500/50' },
-    [ModuleType.SEO]: { color: 'text-teal-400', shadow: 'shadow-teal-500/40', border: 'border-teal-500/50' },
-    [ModuleType.STRUCTURE]: { color: 'text-purple-400', shadow: 'shadow-purple-500/40', border: 'border-purple-500/50' },
-    [ModuleType.WRITING]: { color: 'text-green-400', shadow: 'shadow-green-500/40', border: 'border-green-500/50' },
-    [ModuleType.TABLES]: { color: 'text-cyan-400', shadow: 'shadow-cyan-500/40', border: 'border-cyan-500/50' },
-    [ModuleType.PROMPT]: { color: 'text-orange-400', shadow: 'shadow-orange-500/40', border: 'border-orange-500/50' },
-    [ModuleType.IDEATION]: { color: 'text-pink-400', shadow: 'shadow-pink-500/40', border: 'border-pink-500/50' }
+const MODULE_THEMES: Record<ModuleType, { color: string, shadow: string, border: string, ring: string }> = {
+    [ModuleType.CODE]:      { color: 'text-violet-400', shadow: 'shadow-violet-500/40', border: 'border-violet-500/50',  ring: 'ring-violet-500/60' },
+    [ModuleType.DESIGN]:    { color: 'text-amber-400',  shadow: 'shadow-amber-500/40',  border: 'border-amber-500/50',   ring: 'ring-amber-500/60'  },
+    [ModuleType.SEO]:       { color: 'text-teal-400',   shadow: 'shadow-teal-500/40',   border: 'border-teal-500/50',    ring: 'ring-teal-500/60'   },
+    [ModuleType.STRUCTURE]: { color: 'text-purple-400', shadow: 'shadow-purple-500/40', border: 'border-purple-500/50',  ring: 'ring-purple-500/60' },
+    [ModuleType.WRITING]:   { color: 'text-green-400',  shadow: 'shadow-green-500/40',  border: 'border-green-500/50',   ring: 'ring-green-500/60'  },
+    [ModuleType.TABLES]:    { color: 'text-cyan-400',   shadow: 'shadow-cyan-500/40',   border: 'border-cyan-500/50',    ring: 'ring-cyan-500/60'   },
+    [ModuleType.PROMPT]:    { color: 'text-orange-400', shadow: 'shadow-orange-500/40', border: 'border-orange-500/50',  ring: 'ring-orange-500/60' },
+    [ModuleType.IDEATION]:  { color: 'text-pink-400',   shadow: 'shadow-pink-500/40',   border: 'border-pink-500/50',    ring: 'ring-pink-500/60'   }
 };
 
 // --- SHORT LABELS FOR MODULE MINI-SELECTOR ---
@@ -1155,9 +1155,9 @@ const App: React.FC<AppProps> = ({ user }) => {
                                 onClick={() => handleModuleSelect(mod, {}, false)} 
                                 className={`
                                     relative group flex flex-col items-center justify-center 
-                                    w-12 h-12 md:w-14 md:h-14 rounded-xl border transition-all duration-300 flex-shrink-0 overflow-hidden
+                                    w-12 h-12 md:w-14 md:h-14 rounded-xl border transition-all duration-300 flex-shrink-0
                                     ${isActive 
-                                        ? `bg-black/20 ${theme.border} ${theme.shadow} scale-[1.05]` 
+                                        ? `bg-black/20 ${theme.border} ${theme.ring} ring-1 ring-offset-0 scale-[1.05]` 
                                         : 'bg-transparent border-transparent hover:bg-white/5 opacity-60 hover:opacity-100'
                                     }
                                 `}
@@ -1176,7 +1176,7 @@ const App: React.FC<AppProps> = ({ user }) => {
                                 {/* Label Text (Foreground) */}
                                 <span className={`
                                     relative z-10 text-[8px] md:text-[9px] font-mono font-bold tracking-widest uppercase transition-colors
-                                    ${isActive ? 'text-white' : 'text-gray-500 group-hover:text-gray-300'}
+                                    ${isActive ? theme.color : 'text-gray-500 group-hover:text-gray-300'}
                                 `}>
                                     {MODULE_LABELS[mod]}
                                 </span>
