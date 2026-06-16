@@ -742,7 +742,7 @@ const App: React.FC<AppProps> = ({ user }) => {
             )}
             
             {messages.length === 0 && !processingState.isProcessing && (
-              <div className="flex flex-col items-center justify-start mt-10 select-none space-y-4 animate-fade-in">
+              <div className="flex flex-col items-center justify-start mt-10 select-none space-y-4">
 
                 {/* 8-GRID WORKFLOW LAYOUT (REDESIGNED: SVG GHOST ICONS) */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 w-full max-w-6xl px-4">
@@ -751,13 +751,13 @@ const App: React.FC<AppProps> = ({ user }) => {
                     <div className="w-full h-40">
                         <div 
                             onClick={() => handleModuleSelect(ModuleType.CODE, { preset: 'GENERAL', format: 'MARKDOWN' }, true)}
-                            className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 h-full cursor-pointer transition-colors duration-200 hover:border-violet-500/50 md:transition-all md:hover:-translate-y-1 shadow-lg hover:shadow-violet-900/20"
+                            className="workflow-card group relative rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 h-full cursor-pointer border-violet-500/10 md:overflow-hidden md:transition-all md:hover:-translate-y-1 md:shadow-lg md:hover:shadow-violet-900/20 md:hover:border-violet-500/50"
                         >
-                            <div className="absolute -right-2 -bottom-2 w-20 h-20 text-neutral-500/10 pointer-events-none rotate-12 md:transition-transform md:group-hover:scale-110 md:group-hover:rotate-6">
+                            <div className="hidden md:block absolute -right-2 -bottom-2 w-20 h-20 text-neutral-500/10 pointer-events-none rotate-12 md:transition-transform md:group-hover:scale-110 md:group-hover:rotate-6">
                                 {GHOST_ICONS[ModuleType.CODE]}
                             </div>
                             
-                            <div className="relative z-10 flex flex-col h-full justify-between">
+                            <div className="relative flex flex-col h-full justify-between">
                                 <div>
                                     <h3 className="text-violet-400 font-mono text-[10px] uppercase tracking-widest font-bold mb-1">WORKFLOW #1</h3>
                                     <h2 className="text-white font-bold text-lg leading-tight">{t('workflow_1_title')}</h2>
@@ -773,12 +773,12 @@ const App: React.FC<AppProps> = ({ user }) => {
                     <div className="w-full h-40">
                         <div 
                             onClick={() => handleModuleSelect(ModuleType.DESIGN, { preset: 'GENERAL', format: 'MARKDOWN' }, true)}
-                            className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 h-full cursor-pointer transition-colors duration-200 hover:border-amber-500/50 md:transition-all md:hover:-translate-y-1 shadow-lg hover:shadow-amber-900/20"
+                            className="workflow-card group relative rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 h-full cursor-pointer border-amber-500/10 md:overflow-hidden md:transition-all md:hover:-translate-y-1 md:shadow-lg md:hover:shadow-amber-900/20 md:hover:border-amber-500/50"
                         >
-                            <div className="absolute -right-2 -bottom-2 w-20 h-20 text-neutral-500/10 pointer-events-none rotate-12 md:transition-transform md:group-hover:scale-110 md:group-hover:rotate-6">
+                            <div className="hidden md:block absolute -right-2 -bottom-2 w-20 h-20 text-neutral-500/10 pointer-events-none rotate-12 md:transition-transform md:group-hover:scale-110 md:group-hover:rotate-6">
                                 {GHOST_ICONS[ModuleType.DESIGN]}
                             </div>
-                            <div className="relative z-10 flex flex-col h-full justify-between">
+                            <div className="relative flex flex-col h-full justify-between">
                                 <div>
                                     <h3 className="text-amber-400 font-mono text-[10px] uppercase tracking-widest font-bold mb-1">WORKFLOW #2</h3>
                                     <h2 className="text-white font-bold text-lg leading-tight">{t('workflow_2_title')}</h2>
@@ -794,12 +794,12 @@ const App: React.FC<AppProps> = ({ user }) => {
                     <div className="w-full h-40">
                         <div 
                             onClick={() => handleModuleSelect(ModuleType.SEO, { preset: 'GENERAL', format: 'MARKDOWN' }, true)}
-                            className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 h-full cursor-pointer transition-colors duration-200 hover:border-teal-500/50 md:transition-all md:hover:-translate-y-1 shadow-lg hover:shadow-teal-900/20"
+                            className="workflow-card group relative rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 h-full cursor-pointer border-teal-500/10 md:overflow-hidden md:transition-all md:hover:-translate-y-1 md:shadow-lg md:hover:shadow-teal-900/20 md:hover:border-teal-500/50"
                         >
-                            <div className="absolute -right-2 -bottom-2 w-20 h-20 text-neutral-500/10 pointer-events-none rotate-12 md:transition-transform md:group-hover:scale-110 md:group-hover:rotate-6">
+                            <div className="hidden md:block absolute -right-2 -bottom-2 w-20 h-20 text-neutral-500/10 pointer-events-none rotate-12 md:transition-transform md:group-hover:scale-110 md:group-hover:rotate-6">
                                 {GHOST_ICONS[ModuleType.SEO]}
                             </div>
-                            <div className="relative z-10 flex flex-col h-full justify-between">
+                            <div className="relative flex flex-col h-full justify-between">
                                 <div>
                                     <h3 className="text-teal-500 font-mono text-[10px] uppercase tracking-widest font-bold mb-1">WORKFLOW #3</h3>
                                     <h2 className="text-white font-bold text-lg leading-tight">{t('workflow_3_title')}</h2>
@@ -815,12 +815,12 @@ const App: React.FC<AppProps> = ({ user }) => {
                     <div className="w-full h-40">
                         <div 
                             onClick={() => handleModuleSelect(ModuleType.STRUCTURE, { preset: 'GENERAL', format: 'JSON' }, true)}
-                            className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 h-full cursor-pointer transition-colors duration-200 hover:border-purple-500/50 md:transition-all md:hover:-translate-y-1 shadow-lg hover:shadow-purple-900/20"
+                            className="workflow-card group relative rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 h-full cursor-pointer border-purple-500/10 md:overflow-hidden md:transition-all md:hover:-translate-y-1 md:shadow-lg md:hover:shadow-purple-900/20 md:hover:border-purple-500/50"
                         >
-                            <div className="absolute -right-2 -bottom-2 w-20 h-20 text-neutral-500/10 pointer-events-none rotate-12 md:transition-transform md:group-hover:scale-110 md:group-hover:rotate-6">
+                            <div className="hidden md:block absolute -right-2 -bottom-2 w-20 h-20 text-neutral-500/10 pointer-events-none rotate-12 md:transition-transform md:group-hover:scale-110 md:group-hover:rotate-6">
                                 {GHOST_ICONS[ModuleType.STRUCTURE]}
                             </div>
-                            <div className="relative z-10 flex flex-col h-full justify-between">
+                            <div className="relative flex flex-col h-full justify-between">
                                 <div>
                                     <h3 className="text-purple-500 font-mono text-[10px] uppercase tracking-widest font-bold mb-1">WORKFLOW #4</h3>
                                     <h2 className="text-white font-bold text-lg leading-tight">{t('workflow_4_title')}</h2>
@@ -836,12 +836,12 @@ const App: React.FC<AppProps> = ({ user }) => {
                     <div className="w-full h-40">
                         <div 
                             onClick={() => handleModuleSelect(ModuleType.WRITING, { preset: 'GENERAL', format: 'MARKDOWN' }, true)}
-                            className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 h-full cursor-pointer transition-colors duration-200 hover:border-green-500/50 md:transition-all md:hover:-translate-y-1 shadow-lg hover:shadow-green-900/20"
+                            className="workflow-card group relative rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 h-full cursor-pointer border-green-500/10 md:overflow-hidden md:transition-all md:hover:-translate-y-1 md:shadow-lg md:hover:shadow-green-900/20 md:hover:border-green-500/50"
                         >
-                            <div className="absolute -right-2 -bottom-2 w-20 h-20 text-neutral-500/10 pointer-events-none rotate-12 md:transition-transform md:group-hover:scale-110 md:group-hover:rotate-6">
+                            <div className="hidden md:block absolute -right-2 -bottom-2 w-20 h-20 text-neutral-500/10 pointer-events-none rotate-12 md:transition-transform md:group-hover:scale-110 md:group-hover:rotate-6">
                                 {GHOST_ICONS[ModuleType.WRITING]}
                             </div>
-                            <div className="relative z-10 flex flex-col h-full justify-between">
+                            <div className="relative flex flex-col h-full justify-between">
                                 <div>
                                     <h3 className="text-green-500 font-mono text-[10px] uppercase tracking-widest font-bold mb-1">WORKFLOW #5</h3>
                                     <h2 className="text-white font-bold text-lg leading-tight">{t('workflow_5_title')}</h2>
@@ -857,12 +857,12 @@ const App: React.FC<AppProps> = ({ user }) => {
                     <div className="w-full h-40">
                         <div 
                             onClick={() => handleModuleSelect(ModuleType.TABLES, { preset: 'GENERAL', format: 'CSV' }, true)}
-                            className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 h-full cursor-pointer transition-colors duration-200 hover:border-cyan-500/50 md:transition-all md:hover:-translate-y-1 shadow-lg hover:shadow-cyan-900/20"
+                            className="workflow-card group relative rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 h-full cursor-pointer border-cyan-500/10 md:overflow-hidden md:transition-all md:hover:-translate-y-1 md:shadow-lg md:hover:shadow-cyan-900/20 md:hover:border-cyan-500/50"
                         >
-                            <div className="absolute -right-2 -bottom-2 w-20 h-20 text-neutral-500/10 pointer-events-none rotate-12 md:transition-transform md:group-hover:scale-110 md:group-hover:rotate-6">
+                            <div className="hidden md:block absolute -right-2 -bottom-2 w-20 h-20 text-neutral-500/10 pointer-events-none rotate-12 md:transition-transform md:group-hover:scale-110 md:group-hover:rotate-6">
                                 {GHOST_ICONS[ModuleType.TABLES]}
                             </div>
-                            <div className="relative z-10 flex flex-col h-full justify-between">
+                            <div className="relative flex flex-col h-full justify-between">
                                 <div>
                                     <h3 className="text-cyan-500 font-mono text-[10px] uppercase tracking-widest font-bold mb-1">WORKFLOW #6</h3>
                                     <h2 className="text-white font-bold text-lg leading-tight">{t('workflow_6_title')}</h2>
@@ -878,12 +878,12 @@ const App: React.FC<AppProps> = ({ user }) => {
                     <div className="w-full h-40">
                         <div 
                             onClick={() => handleModuleSelect(ModuleType.PROMPT, { preset: 'GENERAL', format: 'MARKDOWN' }, true)}
-                            className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 h-full cursor-pointer transition-colors duration-200 hover:border-orange-500/50 md:transition-all md:hover:-translate-y-1 shadow-lg hover:shadow-orange-900/20"
+                            className="workflow-card group relative rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 h-full cursor-pointer border-orange-500/10 md:overflow-hidden md:transition-all md:hover:-translate-y-1 md:shadow-lg md:hover:shadow-orange-900/20 md:hover:border-orange-500/50"
                         >
-                            <div className="absolute -right-2 -bottom-2 w-20 h-20 text-neutral-500/10 pointer-events-none rotate-12 md:transition-transform md:group-hover:scale-110 md:group-hover:rotate-6">
+                            <div className="hidden md:block absolute -right-2 -bottom-2 w-20 h-20 text-neutral-500/10 pointer-events-none rotate-12 md:transition-transform md:group-hover:scale-110 md:group-hover:rotate-6">
                                 {GHOST_ICONS[ModuleType.PROMPT]}
                             </div>
-                            <div className="relative z-10 flex flex-col h-full justify-between">
+                            <div className="relative flex flex-col h-full justify-between">
                                 <div>
                                     <h3 className="text-orange-500 font-mono text-[10px] uppercase tracking-widest font-bold mb-1">WORKFLOW #7</h3>
                                     <h2 className="text-white font-bold text-lg leading-tight">{t('workflow_7_title')}</h2>
@@ -899,12 +899,12 @@ const App: React.FC<AppProps> = ({ user }) => {
                     <div className="w-full h-40">
                         <div 
                             onClick={() => handleModuleSelect(ModuleType.IDEATION, { preset: 'GENERAL', format: 'MARKDOWN' }, true)}
-                            className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 h-full cursor-pointer transition-colors duration-200 hover:border-pink-500/50 md:transition-all md:hover:-translate-y-1 shadow-lg hover:shadow-pink-900/20"
+                            className="workflow-card group relative rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 h-full cursor-pointer border-pink-500/10 md:overflow-hidden md:transition-all md:hover:-translate-y-1 md:shadow-lg md:hover:shadow-pink-900/20 md:hover:border-pink-500/50"
                         >
-                            <div className="absolute -right-2 -bottom-2 w-20 h-20 text-neutral-500/10 pointer-events-none rotate-12 md:transition-transform md:group-hover:scale-110 md:group-hover:rotate-6">
+                            <div className="hidden md:block absolute -right-2 -bottom-2 w-20 h-20 text-neutral-500/10 pointer-events-none rotate-12 md:transition-transform md:group-hover:scale-110 md:group-hover:rotate-6">
                                 {GHOST_ICONS[ModuleType.IDEATION]}
                             </div>
-                            <div className="relative z-10 flex flex-col h-full justify-between">
+                            <div className="relative flex flex-col h-full justify-between">
                                 <div>
                                     <h3 className="text-pink-500 font-mono text-[10px] uppercase tracking-widest font-bold mb-1">WORKFLOW #8</h3>
                                     <h2 className="text-white font-bold text-lg leading-tight">{t('workflow_8_title')}</h2>

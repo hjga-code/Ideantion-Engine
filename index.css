@@ -21,3 +21,18 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #404040; 
 }
+
+/* ── Mobile GPU compositing fix ──────────────────────────────────────────────
+   On Android Chrome, box-shadow + transform + overflow:hidden inside a grid
+   can force GPU layer promotion that bleeds into adjacent cells (glitch/artifact).
+   On mobile we prevent speculative layer promotion entirely.
+   Desktop (md+) keeps the richer compositing for hover effects.
+──────────────────────────────────────────────────────────────────────────── */
+@media (max-width: 767px) {
+  .workflow-card {
+    will-change: auto;
+    contain: layout style;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+}
