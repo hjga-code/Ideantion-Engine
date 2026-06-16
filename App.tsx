@@ -137,15 +137,15 @@ const GHOST_ICONS: Record<ModuleType, React.ReactNode> = {
 };
 
 // --- DYNAMIC MODULE COLORS (For Glow Effects) ---
-const MODULE_THEMES: Record<ModuleType, { color: string, shadow: string, border: string, ring: string }> = {
-    [ModuleType.CODE]:      { color: 'text-violet-400', shadow: 'shadow-violet-500/40', border: 'border-violet-500/50',  ring: 'ring-violet-500/60' },
-    [ModuleType.DESIGN]:    { color: 'text-amber-400',  shadow: 'shadow-amber-500/40',  border: 'border-amber-500/50',   ring: 'ring-amber-500/60'  },
-    [ModuleType.SEO]:       { color: 'text-teal-400',   shadow: 'shadow-teal-500/40',   border: 'border-teal-500/50',    ring: 'ring-teal-500/60'   },
-    [ModuleType.STRUCTURE]: { color: 'text-purple-400', shadow: 'shadow-purple-500/40', border: 'border-purple-500/50',  ring: 'ring-purple-500/60' },
-    [ModuleType.WRITING]:   { color: 'text-green-400',  shadow: 'shadow-green-500/40',  border: 'border-green-500/50',   ring: 'ring-green-500/60'  },
-    [ModuleType.TABLES]:    { color: 'text-cyan-400',   shadow: 'shadow-cyan-500/40',   border: 'border-cyan-500/50',    ring: 'ring-cyan-500/60'   },
-    [ModuleType.PROMPT]:    { color: 'text-orange-400', shadow: 'shadow-orange-500/40', border: 'border-orange-500/50',  ring: 'ring-orange-500/60' },
-    [ModuleType.IDEATION]:  { color: 'text-pink-400',   shadow: 'shadow-pink-500/40',   border: 'border-pink-500/50',    ring: 'ring-pink-500/60'   }
+const MODULE_THEMES: Record<ModuleType, { color: string, shadow: string, border: string, ring: string, glow: string, borderRGB: string }> = {
+    [ModuleType.CODE]:      { color: 'text-violet-400', shadow: 'shadow-violet-500/40', border: 'border-violet-500/50',  ring: 'ring-violet-500/60',  glow: '0 0 8px 2px rgba(139,92,246,0.55), 0 0 20px 4px rgba(139,92,246,0.2)', borderRGB: 'rgba(139,92,246,0.6)' },
+    [ModuleType.DESIGN]:    { color: 'text-amber-400',  shadow: 'shadow-amber-500/40',  border: 'border-amber-500/50',   ring: 'ring-amber-500/60',   glow: '0 0 8px 2px rgba(245,158,11,0.55), 0 0 20px 4px rgba(245,158,11,0.2)',  borderRGB: 'rgba(245,158,11,0.6)'  },
+    [ModuleType.SEO]:       { color: 'text-teal-400',   shadow: 'shadow-teal-500/40',   border: 'border-teal-500/50',    ring: 'ring-teal-500/60',    glow: '0 0 8px 2px rgba(20,184,166,0.55), 0 0 20px 4px rgba(20,184,166,0.2)',  borderRGB: 'rgba(20,184,166,0.6)'   },
+    [ModuleType.STRUCTURE]: { color: 'text-purple-400', shadow: 'shadow-purple-500/40', border: 'border-purple-500/50',  ring: 'ring-purple-500/60',  glow: '0 0 8px 2px rgba(168,85,247,0.55), 0 0 20px 4px rgba(168,85,247,0.2)', borderRGB: 'rgba(168,85,247,0.6)' },
+    [ModuleType.WRITING]:   { color: 'text-green-400',  shadow: 'shadow-green-500/40',  border: 'border-green-500/50',   ring: 'ring-green-500/60',   glow: '0 0 8px 2px rgba(34,197,94,0.55), 0 0 20px 4px rgba(34,197,94,0.2)',   borderRGB: 'rgba(34,197,94,0.6)'  },
+    [ModuleType.TABLES]:    { color: 'text-cyan-400',   shadow: 'shadow-cyan-500/40',   border: 'border-cyan-500/50',    ring: 'ring-cyan-500/60',    glow: '0 0 8px 2px rgba(6,182,212,0.55), 0 0 20px 4px rgba(6,182,212,0.2)',   borderRGB: 'rgba(6,182,212,0.6)'   },
+    [ModuleType.PROMPT]:    { color: 'text-orange-400', shadow: 'shadow-orange-500/40', border: 'border-orange-500/50',  ring: 'ring-orange-500/60',  glow: '0 0 8px 2px rgba(249,115,22,0.55), 0 0 20px 4px rgba(249,115,22,0.2)', borderRGB: 'rgba(249,115,22,0.6)' },
+    [ModuleType.IDEATION]:  { color: 'text-pink-400',   shadow: 'shadow-pink-500/40',   border: 'border-pink-500/50',    ring: 'ring-pink-500/60',    glow: '0 0 8px 2px rgba(236,72,153,0.55), 0 0 20px 4px rgba(236,72,153,0.2)',  borderRGB: 'rgba(236,72,153,0.6)'   }
 };
 
 // --- SHORT LABELS FOR MODULE MINI-SELECTOR ---
@@ -751,7 +751,13 @@ const App: React.FC<AppProps> = ({ user }) => {
                     <div className="w-full h-40">
                         <div 
                             onClick={() => handleModuleSelect(ModuleType.CODE, { preset: 'GENERAL', format: 'MARKDOWN' }, true)}
-                            className="workflow-card group relative rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 h-full cursor-pointer border-violet-500/10 md:overflow-hidden md:transition-all md:hover:-translate-y-1 md:shadow-lg md:hover:shadow-violet-900/20 md:hover:border-violet-500/50"
+                            className={`workflow-card group relative rounded-2xl border bg-[#0a0a0a] p-5 h-full cursor-pointer md:overflow-hidden md:transition-all md:hover:-translate-y-1 md:shadow-lg md:hover:shadow-violet-900/20 md:hover:border-violet-500/50 ${
+                                activeModule === ModuleType.CODE ? '' : 'border-violet-500/10'
+                            }`}
+                            style={activeModule === ModuleType.CODE ? {
+                                boxShadow: MODULE_THEMES[ModuleType.CODE].glow,
+                                borderColor: MODULE_THEMES[ModuleType.CODE].borderRGB
+                            } : undefined}
                         >
                             <div className="hidden md:block absolute -right-2 -bottom-2 w-20 h-20 text-neutral-500/10 pointer-events-none rotate-12 md:transition-transform md:group-hover:scale-110 md:group-hover:rotate-6">
                                 {GHOST_ICONS[ModuleType.CODE]}
@@ -759,7 +765,12 @@ const App: React.FC<AppProps> = ({ user }) => {
                             
                             <div className="relative flex flex-col h-full justify-between">
                                 <div>
-                                    <h3 className="text-violet-400 font-mono text-[10px] uppercase tracking-widest font-bold mb-1">WORKFLOW #1</h3>
+                                    <h3 className="text-violet-400 font-mono text-[10px] uppercase tracking-widest font-bold mb-1 flex items-center gap-1.5">
+                                        WORKFLOW #1
+                                        {activeModule === ModuleType.CODE && (
+                                            <span className="inline-block w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse" />
+                                        )}
+                                    </h3>
                                     <h2 className="text-white font-bold text-lg leading-tight">{t('workflow_1_title')}</h2>
                                 </div>
                                 <p className="text-gray-400 text-[10px] leading-relaxed font-light">
@@ -773,14 +784,25 @@ const App: React.FC<AppProps> = ({ user }) => {
                     <div className="w-full h-40">
                         <div 
                             onClick={() => handleModuleSelect(ModuleType.DESIGN, { preset: 'GENERAL', format: 'MARKDOWN' }, true)}
-                            className="workflow-card group relative rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 h-full cursor-pointer border-amber-500/10 md:overflow-hidden md:transition-all md:hover:-translate-y-1 md:shadow-lg md:hover:shadow-amber-900/20 md:hover:border-amber-500/50"
+                            className={`workflow-card group relative rounded-2xl border bg-[#0a0a0a] p-5 h-full cursor-pointer md:overflow-hidden md:transition-all md:hover:-translate-y-1 md:shadow-lg md:hover:shadow-amber-900/20 md:hover:border-amber-500/50 ${
+                                activeModule === ModuleType.DESIGN ? '' : 'border-amber-500/10'
+                            }`}
+                            style={activeModule === ModuleType.DESIGN ? {
+                                boxShadow: MODULE_THEMES[ModuleType.DESIGN].glow,
+                                borderColor: MODULE_THEMES[ModuleType.DESIGN].borderRGB
+                            } : undefined}
                         >
                             <div className="hidden md:block absolute -right-2 -bottom-2 w-20 h-20 text-neutral-500/10 pointer-events-none rotate-12 md:transition-transform md:group-hover:scale-110 md:group-hover:rotate-6">
                                 {GHOST_ICONS[ModuleType.DESIGN]}
                             </div>
                             <div className="relative flex flex-col h-full justify-between">
                                 <div>
-                                    <h3 className="text-amber-400 font-mono text-[10px] uppercase tracking-widest font-bold mb-1">WORKFLOW #2</h3>
+                                    <h3 className="text-amber-400 font-mono text-[10px] uppercase tracking-widest font-bold mb-1 flex items-center gap-1.5">
+                                        WORKFLOW #2
+                                        {activeModule === ModuleType.DESIGN && (
+                                            <span className="inline-block w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                                        )}
+                                    </h3>
                                     <h2 className="text-white font-bold text-lg leading-tight">{t('workflow_2_title')}</h2>
                                 </div>
                                 <p className="text-gray-400 text-[10px] leading-relaxed font-light">
@@ -794,14 +816,25 @@ const App: React.FC<AppProps> = ({ user }) => {
                     <div className="w-full h-40">
                         <div 
                             onClick={() => handleModuleSelect(ModuleType.SEO, { preset: 'GENERAL', format: 'MARKDOWN' }, true)}
-                            className="workflow-card group relative rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 h-full cursor-pointer border-teal-500/10 md:overflow-hidden md:transition-all md:hover:-translate-y-1 md:shadow-lg md:hover:shadow-teal-900/20 md:hover:border-teal-500/50"
+                            className={`workflow-card group relative rounded-2xl border bg-[#0a0a0a] p-5 h-full cursor-pointer md:overflow-hidden md:transition-all md:hover:-translate-y-1 md:shadow-lg md:hover:shadow-teal-900/20 md:hover:border-teal-500/50 ${
+                                activeModule === ModuleType.SEO ? '' : 'border-teal-500/10'
+                            }`}
+                            style={activeModule === ModuleType.SEO ? {
+                                boxShadow: MODULE_THEMES[ModuleType.SEO].glow,
+                                borderColor: MODULE_THEMES[ModuleType.SEO].borderRGB
+                            } : undefined}
                         >
                             <div className="hidden md:block absolute -right-2 -bottom-2 w-20 h-20 text-neutral-500/10 pointer-events-none rotate-12 md:transition-transform md:group-hover:scale-110 md:group-hover:rotate-6">
                                 {GHOST_ICONS[ModuleType.SEO]}
                             </div>
                             <div className="relative flex flex-col h-full justify-between">
                                 <div>
-                                    <h3 className="text-teal-500 font-mono text-[10px] uppercase tracking-widest font-bold mb-1">WORKFLOW #3</h3>
+                                    <h3 className="text-teal-500 font-mono text-[10px] uppercase tracking-widest font-bold mb-1 flex items-center gap-1.5">
+                                        WORKFLOW #3
+                                        {activeModule === ModuleType.SEO && (
+                                            <span className="inline-block w-1.5 h-1.5 rounded-full bg-teal-500 animate-pulse" />
+                                        )}
+                                    </h3>
                                     <h2 className="text-white font-bold text-lg leading-tight">{t('workflow_3_title')}</h2>
                                 </div>
                                 <p className="text-gray-400 text-[10px] leading-relaxed font-light">
@@ -815,14 +848,25 @@ const App: React.FC<AppProps> = ({ user }) => {
                     <div className="w-full h-40">
                         <div 
                             onClick={() => handleModuleSelect(ModuleType.STRUCTURE, { preset: 'GENERAL', format: 'JSON' }, true)}
-                            className="workflow-card group relative rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 h-full cursor-pointer border-purple-500/10 md:overflow-hidden md:transition-all md:hover:-translate-y-1 md:shadow-lg md:hover:shadow-purple-900/20 md:hover:border-purple-500/50"
+                            className={`workflow-card group relative rounded-2xl border bg-[#0a0a0a] p-5 h-full cursor-pointer md:overflow-hidden md:transition-all md:hover:-translate-y-1 md:shadow-lg md:hover:shadow-purple-900/20 md:hover:border-purple-500/50 ${
+                                activeModule === ModuleType.STRUCTURE ? '' : 'border-purple-500/10'
+                            }`}
+                            style={activeModule === ModuleType.STRUCTURE ? {
+                                boxShadow: MODULE_THEMES[ModuleType.STRUCTURE].glow,
+                                borderColor: MODULE_THEMES[ModuleType.STRUCTURE].borderRGB
+                            } : undefined}
                         >
                             <div className="hidden md:block absolute -right-2 -bottom-2 w-20 h-20 text-neutral-500/10 pointer-events-none rotate-12 md:transition-transform md:group-hover:scale-110 md:group-hover:rotate-6">
                                 {GHOST_ICONS[ModuleType.STRUCTURE]}
                             </div>
                             <div className="relative flex flex-col h-full justify-between">
                                 <div>
-                                    <h3 className="text-purple-500 font-mono text-[10px] uppercase tracking-widest font-bold mb-1">WORKFLOW #4</h3>
+                                    <h3 className="text-purple-500 font-mono text-[10px] uppercase tracking-widest font-bold mb-1 flex items-center gap-1.5">
+                                        WORKFLOW #4
+                                        {activeModule === ModuleType.STRUCTURE && (
+                                            <span className="inline-block w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse" />
+                                        )}
+                                    </h3>
                                     <h2 className="text-white font-bold text-lg leading-tight">{t('workflow_4_title')}</h2>
                                 </div>
                                 <p className="text-gray-400 text-[10px] leading-relaxed font-light">
@@ -836,14 +880,25 @@ const App: React.FC<AppProps> = ({ user }) => {
                     <div className="w-full h-40">
                         <div 
                             onClick={() => handleModuleSelect(ModuleType.WRITING, { preset: 'GENERAL', format: 'MARKDOWN' }, true)}
-                            className="workflow-card group relative rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 h-full cursor-pointer border-green-500/10 md:overflow-hidden md:transition-all md:hover:-translate-y-1 md:shadow-lg md:hover:shadow-green-900/20 md:hover:border-green-500/50"
+                            className={`workflow-card group relative rounded-2xl border bg-[#0a0a0a] p-5 h-full cursor-pointer md:overflow-hidden md:transition-all md:hover:-translate-y-1 md:shadow-lg md:hover:shadow-green-900/20 md:hover:border-green-500/50 ${
+                                activeModule === ModuleType.WRITING ? '' : 'border-green-500/10'
+                            }`}
+                            style={activeModule === ModuleType.WRITING ? {
+                                boxShadow: MODULE_THEMES[ModuleType.WRITING].glow,
+                                borderColor: MODULE_THEMES[ModuleType.WRITING].borderRGB
+                            } : undefined}
                         >
                             <div className="hidden md:block absolute -right-2 -bottom-2 w-20 h-20 text-neutral-500/10 pointer-events-none rotate-12 md:transition-transform md:group-hover:scale-110 md:group-hover:rotate-6">
                                 {GHOST_ICONS[ModuleType.WRITING]}
                             </div>
                             <div className="relative flex flex-col h-full justify-between">
                                 <div>
-                                    <h3 className="text-green-500 font-mono text-[10px] uppercase tracking-widest font-bold mb-1">WORKFLOW #5</h3>
+                                    <h3 className="text-green-500 font-mono text-[10px] uppercase tracking-widest font-bold mb-1 flex items-center gap-1.5">
+                                        WORKFLOW #5
+                                        {activeModule === ModuleType.WRITING && (
+                                            <span className="inline-block w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                                        )}
+                                    </h3>
                                     <h2 className="text-white font-bold text-lg leading-tight">{t('workflow_5_title')}</h2>
                                 </div>
                                 <p className="text-gray-400 text-[10px] leading-relaxed font-light">
@@ -857,14 +912,25 @@ const App: React.FC<AppProps> = ({ user }) => {
                     <div className="w-full h-40">
                         <div 
                             onClick={() => handleModuleSelect(ModuleType.TABLES, { preset: 'GENERAL', format: 'CSV' }, true)}
-                            className="workflow-card group relative rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 h-full cursor-pointer border-cyan-500/10 md:overflow-hidden md:transition-all md:hover:-translate-y-1 md:shadow-lg md:hover:shadow-cyan-900/20 md:hover:border-cyan-500/50"
+                            className={`workflow-card group relative rounded-2xl border bg-[#0a0a0a] p-5 h-full cursor-pointer md:overflow-hidden md:transition-all md:hover:-translate-y-1 md:shadow-lg md:hover:shadow-cyan-900/20 md:hover:border-cyan-500/50 ${
+                                activeModule === ModuleType.TABLES ? '' : 'border-cyan-500/10'
+                            }`}
+                            style={activeModule === ModuleType.TABLES ? {
+                                boxShadow: MODULE_THEMES[ModuleType.TABLES].glow,
+                                borderColor: MODULE_THEMES[ModuleType.TABLES].borderRGB
+                            } : undefined}
                         >
                             <div className="hidden md:block absolute -right-2 -bottom-2 w-20 h-20 text-neutral-500/10 pointer-events-none rotate-12 md:transition-transform md:group-hover:scale-110 md:group-hover:rotate-6">
                                 {GHOST_ICONS[ModuleType.TABLES]}
                             </div>
                             <div className="relative flex flex-col h-full justify-between">
                                 <div>
-                                    <h3 className="text-cyan-500 font-mono text-[10px] uppercase tracking-widest font-bold mb-1">WORKFLOW #6</h3>
+                                    <h3 className="text-cyan-500 font-mono text-[10px] uppercase tracking-widest font-bold mb-1 flex items-center gap-1.5">
+                                        WORKFLOW #6
+                                        {activeModule === ModuleType.TABLES && (
+                                            <span className="inline-block w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse" />
+                                        )}
+                                    </h3>
                                     <h2 className="text-white font-bold text-lg leading-tight">{t('workflow_6_title')}</h2>
                                 </div>
                                 <p className="text-gray-400 text-[10px] leading-relaxed font-light">
@@ -878,14 +944,25 @@ const App: React.FC<AppProps> = ({ user }) => {
                     <div className="w-full h-40">
                         <div 
                             onClick={() => handleModuleSelect(ModuleType.PROMPT, { preset: 'GENERAL', format: 'MARKDOWN' }, true)}
-                            className="workflow-card group relative rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 h-full cursor-pointer border-orange-500/10 md:overflow-hidden md:transition-all md:hover:-translate-y-1 md:shadow-lg md:hover:shadow-orange-900/20 md:hover:border-orange-500/50"
+                            className={`workflow-card group relative rounded-2xl border bg-[#0a0a0a] p-5 h-full cursor-pointer md:overflow-hidden md:transition-all md:hover:-translate-y-1 md:shadow-lg md:hover:shadow-orange-900/20 md:hover:border-orange-500/50 ${
+                                activeModule === ModuleType.PROMPT ? '' : 'border-orange-500/10'
+                            }`}
+                            style={activeModule === ModuleType.PROMPT ? {
+                                boxShadow: MODULE_THEMES[ModuleType.PROMPT].glow,
+                                borderColor: MODULE_THEMES[ModuleType.PROMPT].borderRGB
+                            } : undefined}
                         >
                             <div className="hidden md:block absolute -right-2 -bottom-2 w-20 h-20 text-neutral-500/10 pointer-events-none rotate-12 md:transition-transform md:group-hover:scale-110 md:group-hover:rotate-6">
                                 {GHOST_ICONS[ModuleType.PROMPT]}
                             </div>
                             <div className="relative flex flex-col h-full justify-between">
                                 <div>
-                                    <h3 className="text-orange-500 font-mono text-[10px] uppercase tracking-widest font-bold mb-1">WORKFLOW #7</h3>
+                                    <h3 className="text-orange-500 font-mono text-[10px] uppercase tracking-widest font-bold mb-1 flex items-center gap-1.5">
+                                        WORKFLOW #7
+                                        {activeModule === ModuleType.PROMPT && (
+                                            <span className="inline-block w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse" />
+                                        )}
+                                    </h3>
                                     <h2 className="text-white font-bold text-lg leading-tight">{t('workflow_7_title')}</h2>
                                 </div>
                                 <p className="text-gray-400 text-[10px] leading-relaxed font-light">
@@ -899,14 +976,25 @@ const App: React.FC<AppProps> = ({ user }) => {
                     <div className="w-full h-40">
                         <div 
                             onClick={() => handleModuleSelect(ModuleType.IDEATION, { preset: 'GENERAL', format: 'MARKDOWN' }, true)}
-                            className="workflow-card group relative rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 h-full cursor-pointer border-pink-500/10 md:overflow-hidden md:transition-all md:hover:-translate-y-1 md:shadow-lg md:hover:shadow-pink-900/20 md:hover:border-pink-500/50"
+                            className={`workflow-card group relative rounded-2xl border bg-[#0a0a0a] p-5 h-full cursor-pointer md:overflow-hidden md:transition-all md:hover:-translate-y-1 md:shadow-lg md:hover:shadow-pink-900/20 md:hover:border-pink-500/50 ${
+                                activeModule === ModuleType.IDEATION ? '' : 'border-pink-500/10'
+                            }`}
+                            style={activeModule === ModuleType.IDEATION ? {
+                                boxShadow: MODULE_THEMES[ModuleType.IDEATION].glow,
+                                borderColor: MODULE_THEMES[ModuleType.IDEATION].borderRGB
+                            } : undefined}
                         >
                             <div className="hidden md:block absolute -right-2 -bottom-2 w-20 h-20 text-neutral-500/10 pointer-events-none rotate-12 md:transition-transform md:group-hover:scale-110 md:group-hover:rotate-6">
                                 {GHOST_ICONS[ModuleType.IDEATION]}
                             </div>
                             <div className="relative flex flex-col h-full justify-between">
                                 <div>
-                                    <h3 className="text-pink-500 font-mono text-[10px] uppercase tracking-widest font-bold mb-1">WORKFLOW #8</h3>
+                                    <h3 className="text-pink-500 font-mono text-[10px] uppercase tracking-widest font-bold mb-1 flex items-center gap-1.5">
+                                        WORKFLOW #8
+                                        {activeModule === ModuleType.IDEATION && (
+                                            <span className="inline-block w-1.5 h-1.5 rounded-full bg-pink-500 animate-pulse" />
+                                        )}
+                                    </h3>
                                     <h2 className="text-white font-bold text-lg leading-tight">{t('workflow_8_title')}</h2>
                                 </div>
                                 <p className="text-gray-400 text-[10px] leading-relaxed font-light">
@@ -1157,10 +1245,14 @@ const App: React.FC<AppProps> = ({ user }) => {
                                     relative group flex flex-col items-center justify-center 
                                     w-12 h-12 md:w-14 md:h-14 rounded-xl border transition-all duration-300 flex-shrink-0
                                     ${isActive 
-                                        ? `bg-black/20 ${theme.border} ${theme.ring} ring-1 ring-offset-0 scale-[1.05]` 
+                                        ? 'bg-black/20 scale-[1.05]' 
                                         : 'bg-transparent border-transparent hover:bg-white/5 opacity-60 hover:opacity-100'
                                     }
                                 `}
+                                style={isActive ? { 
+                                    boxShadow: theme.glow, 
+                                    borderColor: theme.borderRGB 
+                                } : undefined}
                             >
                                 {/* Watermark Ghost Icon (Background) */}
                                 <div className={`
