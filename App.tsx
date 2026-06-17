@@ -234,6 +234,46 @@ const App: React.FC<AppProps> = ({ user }) => {
     geminiModel: 'gemini-3.5-flash' 
   });
 
+  const [copiedPrompt, setCopiedPrompt] = useState(false);
+
+  const handleCopyMasterPrompt = () => {
+    const promptText = uiLanguage === 'en' ? `Act as the Prompt Engineering Consultant for the Ideation Engine. Your objective is to help me structure my ideas to use them in this application.
+
+The application has 8 specific Workflows:
+1. Content Generation (Social media, reels, carousels, posts, captions).
+2. Smart Calendar (Content calendars, task plans, project sprints, product launches).
+3. SEO & Growth (SEO audits, Google/Meta ad campaigns, keyword strategies, landing page copy, GEO/AI search optimization).
+4. Voice to Structure (Synthesizing voice notes into structured text, JSON schemas, knowledge graphs, meeting minutes).
+5. Pro Refinement (Professional emails, persuasive sales copy, UX microcopy, brand storytelling).
+6. Table Engine (Financial P&L models, product roadmaps with RICE scoring, comparison matrices, data analysis, product inventories, Excel/Sheets formulas, data visualization, budget planners, relational database schemas).
+7. Universal Prompt (System instructions in XML, Midjourney/Flux prompts, video generation prompts, Chain of Thought optimization).
+8. Brainstorming (Lateral thinking, SCAMPER technique, startup validation, pre-mortem analysis).
+
+Please:
+1. Conduct a brief, structured briefing with key questions to understand my goal and collect the precise data.
+2. Based on my answers, write a professional, ultra-specific master prompt containing all the structured data.
+3. Tell me exactly which Workflow, Preset, and Output Format I should configure in the Ideation Engine to paste this master prompt and get the perfect professional result.` : `Actúa como el Consultor de Ingeniería de Prompts del Ideation Engine. Tu objetivo es ayudarme a estructurar mis ideas para usarlas en esta aplicación.
+
+La aplicación cuenta con 8 Workflows específicos:
+1. Generación de Contenido (Redes sociales, reels, carruseles, posts).
+2. Calendario Inteligente (Planes y calendarios de contenidos, tareas, sprints, lanzamientos).
+3. SEO y Crecimiento (Auditorías técnicas SEO, campañas de anuncios Google/Meta, estrategias de palabras clave, copys para landing pages, optimización GEO).
+4. Voz a Estructura (Sintetizar notas de voz en notas estructuradas, esquemas JSON, grafos de conocimiento, minutas de reuniones).
+5. Refinamiento Pro (Emails profesionales, copy de ventas persuasivo, microcopy UX, storytelling).
+6. Motor de Tablas (Modelos financieros P&L, product roadmaps con RICE, matrices comparativas ponderadas, análisis de datos, inventarios de productos, generador de fórmulas Excel/Sheets, visualización de datos, presupuestos, diseño de bases de datos relacionales).
+7. Prompt Universal (Creación de system prompts en XML, prompts para Midjourney/Flux, scripts de video, optimizaciones Chain of Thought).
+8. Lluvia de Ideas (Pensamiento lateral, técnica SCAMPER, análisis pre-mortem, estrategia Blue Ocean).
+
+Por favor:
+1. Hazme una entrevista breve y estructurada (briefing) con preguntas clave para entender exactamente mi objetivo y recolectar los datos precisos.
+2. Basado en mis respuestas, redacta un prompt maestro profesional y ultra-específico que contenga todos los datos estructurados.
+3. Indícame exactamente qué Workflow de la app, qué Preset y qué Formato de salida debo configurar en la aplicación para pegar este prompt maestro y obtener el resultado final profesional perfecto.`;
+
+    navigator.clipboard.writeText(promptText);
+    setCopiedPrompt(true);
+    setTimeout(() => setCopiedPrompt(false), 2000);
+  };
+
   // --- EFFECTS ---
 
   // Load sessions from Supabase on mount
@@ -675,8 +715,30 @@ const App: React.FC<AppProps> = ({ user }) => {
               </button>
             </div>
 
-            {/* Always visible: language switcher + avatar + logout */}
+            {/* Always visible: master prompt + language switcher + avatar + logout */}
             <div className="flex items-center gap-2">
+              <button 
+                onClick={handleCopyMasterPrompt}
+                title={uiLanguage === 'en' ? 'Copy External LLM Master Prompt' : 'Copiar Prompt Maestro para LLM Externo'}
+                className={`px-2 py-1 text-[10px] font-mono border rounded hover:bg-thinklab-surface transition-all flex items-center gap-1.5 ${
+                  copiedPrompt 
+                    ? 'bg-emerald-900/20 border-emerald-900 text-emerald-400 font-bold' 
+                    : 'bg-black/20 border-thinklab-border text-thinklab-text hover:text-white'
+                }`}
+              >
+                {copiedPrompt ? (
+                  <>
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block animate-pulse"></span>
+                    {uiLanguage === 'en' ? 'COPIED!' : '¡COPIADO!'}
+                  </>
+                ) : (
+                  <>
+                    <span>💡</span>
+                    <span className="hidden sm:inline">{uiLanguage === 'en' ? 'Master Prompt' : 'Prompt Maestro'}</span>
+                    <span className="inline sm:hidden">{uiLanguage === 'en' ? 'Prompt' : 'Prompt'}</span>
+                  </>
+                )}
+              </button>
               <button 
                 onClick={() => changeUiLanguage(uiLanguage === 'en' ? 'es' : 'en')}
                 title={uiLanguage === 'en' ? 'Cambiar a Español' : 'Switch to English'}
