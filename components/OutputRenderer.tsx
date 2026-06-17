@@ -1051,7 +1051,12 @@ const CopyableBlock: React.FC<CopyableBlockProps> = ({ label, code, isProse = fa
         </div>
       </div>
       <div className="p-4 md:p-5 overflow-x-auto">
-        {isProse ? (
+        {hasTableData(code) ? (
+          <div 
+            className="prose-content text-thinklab-text font-light leading-relaxed text-sm md:text-base"
+            dangerouslySetInnerHTML={{ __html: markdownToHTML(code.trim()) }}
+          />
+        ) : isProse ? (
           <div className="prose prose-invert prose-sm md:prose-base max-w-none font-light leading-relaxed whitespace-pre-wrap text-thinklab-text">
             {code.trim()}
           </div>
