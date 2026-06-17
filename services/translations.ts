@@ -36,7 +36,7 @@ export const TRANSLATIONS = {
     workflow_5_desc: 'Persuasive Engineering. Elevate drafts to hypnotic narratives using psychological frameworks (AIDA, PAS).',
     
     workflow_6_title: 'Table Engine',
-    workflow_6_desc: 'Data Matrix. Generate content calendars and complex databases, exportable directly to CSV.',
+    workflow_6_desc: 'Data Intelligence. Analyze raw data, build budgets, write formulas, design databases and complex inventories.',
     
     workflow_7_title: 'Universal Prompt',
     workflow_7_desc: 'Meta-Programming. Design master instructions to dominate Midjourney v6, Flux, or XML Systems.',
@@ -118,7 +118,7 @@ export const TRANSLATIONS = {
     workflow_5_desc: 'Ingeniería persuasiva. Eleva borradores a narrativas hipnóticas usando marcos psicológicos (AIDA, PAS).',
     
     workflow_6_title: 'Motor de Tablas',
-    workflow_6_desc: 'Matriz de datos. Genera calendarios de contenido y bases de datos complejas, exportables a CSV.',
+    workflow_6_desc: 'Inteligencia de Datos. Análisis de datos, presupuestos, fórmulas, bases de datos e inventarios complejos.',
     
     workflow_7_title: 'Prompt Universal',
     workflow_7_desc: 'Meta-programación. Diseña instrucciones maestras para dominar Midjourney v6, Flux o sistemas XML.',

@@ -43,12 +43,17 @@ export type PresetType =
   | 'CALENDAR_WEEKLY'        // Planificación semanal personal
 
   // TABLES (Complex Data)
-  | 'CONTENT_CALENDAR'
   | 'DATA_TABLE'
   | 'PRICING_TABLE'
   | 'FINANCIAL_MODEL'         // P&L, Unit Economics
   | 'PRODUCT_ROADMAP'         // RICE scoring, Gantt prep
   | 'COMPARISON_MATRIX'       // Weighted decision matrix
+  | 'DATA_ANALYSIS'           // Data insights & cleaning
+  | 'PRODUCT_INVENTORY'       // Stock, SKU, pricing
+  | 'FORMULA_INTELLIGENCE'    // Complex Excel/Sheets formulas & regex
+  | 'DATA_VISUALIZATION'      // Chart configurations / bulk plots
+  | 'BUDGET_PLANNER'          // Budgets, cost tracking & forecasting
+  | 'DATABASE_DESIGN'         // Relational schemas, SQL & collections
 
   // SEO (Growth Hacking)
   | 'SEO_AUDIT'

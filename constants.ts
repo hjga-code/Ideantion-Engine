@@ -72,7 +72,12 @@ export const LOCALIZED_PRESETS: Record<'en' | 'es', Record<PresetType, string>> 
     'CONTENT_ADVERTISING': 'Advertising Content (Ads)',
     'CONTENT_PERSONAL_BRAND': 'Personal Brand (Authority)',
     'CONTENT_CREATOR': 'Creators (YouTube / Podcast / Newsletter)',
-    'CONTENT_CALENDAR': 'Content Calendar',
+    'DATA_ANALYSIS': 'Data Analysis & Insights',
+    'PRODUCT_INVENTORY': 'Product Inventory System',
+    'FORMULA_INTELLIGENCE': 'Formula Builder & Analyzer',
+    'DATA_VISUALIZATION': 'Mass Data Visualization',
+    'BUDGET_PLANNER': 'Budget & Cost Planner',
+    'DATABASE_DESIGN': 'Database & Schema Design',
     'DATA_TABLE': 'General Data Table',
     'PRICING_TABLE': 'Pricing Table',
     'FINANCIAL_MODEL': 'Financial Model (P&L)',
@@ -118,7 +123,12 @@ export const LOCALIZED_PRESETS: Record<'en' | 'es', Record<PresetType, string>> 
     'CONTENT_ADVERTISING': 'Contenido Publicitario (Ads)',
     'CONTENT_PERSONAL_BRAND': 'Marca Personal (Autoridad)',
     'CONTENT_CREATOR': 'Creadores (YouTube / Podcast / Newsletter)',
-    'CONTENT_CALENDAR': 'Calendario de Contenidos',
+    'DATA_ANALYSIS': 'Análisis de Datos e Insights',
+    'PRODUCT_INVENTORY': 'Inventario de Productos',
+    'FORMULA_INTELLIGENCE': 'Generador y Analizador de Fórmulas',
+    'DATA_VISUALIZATION': 'Visualización Masiva de Datos',
+    'BUDGET_PLANNER': 'Presupuestos y Costes',
+    'DATABASE_DESIGN': 'Diseño de Bases de Datos',
     'DATA_TABLE': 'Tabla de Datos General',
     'PRICING_TABLE': 'Tabla de Precios',
     'FINANCIAL_MODEL': 'Modelo Financiero (P&L)',
@@ -209,7 +219,7 @@ export const MODULE_SPECIFIC_CONFIG: Record<ModuleType, { validPresets: PresetTy
         validFormats: ['MARKDOWN', 'PLAIN_TEXT']
     },
     [ModuleType.TABLES]: {
-        validPresets: ['FINANCIAL_MODEL', 'PRODUCT_ROADMAP', 'COMPARISON_MATRIX', 'CONTENT_CALENDAR', 'DATA_TABLE', 'PRICING_TABLE', 'GENERAL'],
+        validPresets: ['FINANCIAL_MODEL', 'PRODUCT_ROADMAP', 'COMPARISON_MATRIX', 'DATA_ANALYSIS', 'PRODUCT_INVENTORY', 'FORMULA_INTELLIGENCE', 'DATA_VISUALIZATION', 'BUDGET_PLANNER', 'DATABASE_DESIGN', 'DATA_TABLE', 'PRICING_TABLE', 'GENERAL'],
         validFormats: ['CSV', 'MARKDOWN'] // Preferred CSV
     },
     [ModuleType.SEO]: {
